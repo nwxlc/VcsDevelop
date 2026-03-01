@@ -1,8 +1,18 @@
 namespace GitDevelop.Domain.Entities;
 
-public class Tree
+public sealed class Tree
 {
-    public Guid Id { get; set; }
-    public IReadOnlyCollection<TreeEntry> Entries { get; set; }
-    public ContentHash Hash { get; set; }
+    public Guid Id { get; private init; }
+    public IReadOnlyCollection<TreeEntry> Entries { get; private init; }
+    public ContentHash Hash { get; private init; }
+
+    public Tree(
+        Guid id,
+        IReadOnlyCollection<TreeEntry> entries,
+        ContentHash hash)
+    {
+        Id = id;
+        Entries = entries;
+        Hash = hash;
+    }
 }

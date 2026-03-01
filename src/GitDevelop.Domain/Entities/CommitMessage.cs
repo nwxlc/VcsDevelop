@@ -1,6 +1,11 @@
 namespace GitDevelop.Domain.Entities;
 
-public class CommitMessage
+public sealed class CommitMessage
 {
-    public string Value { get; set; }
+    public string Value { get; private init; }
+
+    public CommitMessage(string value)
+    {
+        Value = value;
+    }
 }

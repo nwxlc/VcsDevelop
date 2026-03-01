@@ -1,6 +1,11 @@
 namespace GitDevelop.Domain.Entities;
 
-public class ContentHash
+public sealed class ContentHash
 {
-    public byte[] Value { get; set; }
+    public byte[] Value { get; private init; }
+
+    public ContentHash(byte[] value)
+    {
+        Value = value;
+    }
 }
