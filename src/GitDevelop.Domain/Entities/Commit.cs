@@ -3,7 +3,7 @@ namespace GitDevelop.Domain.Entities;
 public sealed class Commit
 {
     public Guid Id { get; private init; }
-    public Guid DocumentId { get; private init; }
+    public Guid RepositoryId { get; private init; }
     public Guid RootTreeId { get; private init; }
     public IReadOnlyCollection<Guid> ParentIds { get; private init; }
     public Author Author { get; private init; }
@@ -13,7 +13,7 @@ public sealed class Commit
 
     public Commit(
         Guid id,
-        Guid documentId,
+        Guid repositoryId,
         Guid rootTreeId,
         IReadOnlyCollection<Guid> parentIds,
         Author author,
@@ -22,7 +22,7 @@ public sealed class Commit
         ContentHash hash)
     {
         Id = id;
-        DocumentId = documentId;
+        RepositoryId = repositoryId;
         RootTreeId = rootTreeId;
         ParentIds = parentIds;
         Author = author;
