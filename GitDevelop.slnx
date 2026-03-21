@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GitDevelop.Domain/GitDevelop.Domain.csproj" />
+    <Project Path="src/GitDevelop.Infrastructure/GitDevelop.Infrastructure.csproj" />
+  </Folder>
+</Solution>
