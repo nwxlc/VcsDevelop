@@ -17,6 +17,7 @@ public sealed class RepositoryConfiguration : IEntityTypeConfiguration<Repositor
             .HasKey(repository => repository.Id)
             .HasName("pk_repositories");
 
+        // properties
         builder
             .Property(repository => repository.Id)
             .HasColumnName("id");
@@ -38,6 +39,7 @@ public sealed class RepositoryConfiguration : IEntityTypeConfiguration<Repositor
             .HasColumnName("created_at")
             .IsRequired();
 
+        // ownerships
         builder
             .OwnsOne(repository => repository.Metadata, metadata =>
             {

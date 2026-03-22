@@ -21,6 +21,7 @@ public sealed class BranchConfiguration : IEntityTypeConfiguration<Branch>
             .Property(branch => branch.Id)
             .HasColumnName("id");
 
+        // properties
         builder
             .Property(branch => branch.RepositoryId)
             .HasColumnName("repository_id")
@@ -47,6 +48,7 @@ public sealed class BranchConfiguration : IEntityTypeConfiguration<Branch>
             .IsUnique()
             .HasDatabaseName("ux_branches_repository_name");
 
+        // ownerships
         builder
             .HasOne<Repository>()
             .WithMany()

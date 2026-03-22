@@ -11,11 +11,11 @@ public class Blob
         Guid id,
         ContentHash hash,
         long size,
-        DateTime createAt)
+        DateTime createdAt)
     {
         Id = id;
         Hash = hash;
         Size = size;
-        CreatedAt = createAt;
+        CreatedAt = createdAt;
     }
 }

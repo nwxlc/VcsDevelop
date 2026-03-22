@@ -16,6 +16,7 @@ public class AuthorConfiguration : IEntityTypeConfiguration<Author>
             .HasKey(author => author.Id)
             .HasName("pk_authors");
 
+        // properties
         builder
             .Property(author => author.Id)
             .HasColumnName("id");
@@ -32,6 +33,7 @@ public class AuthorConfiguration : IEntityTypeConfiguration<Author>
             .HasMaxLength(320)
             .IsRequired();
 
+        // indexes
         builder
             .HasIndex(author => author.Email)
             .IsUnique()

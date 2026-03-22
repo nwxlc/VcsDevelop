@@ -17,6 +17,7 @@ public sealed class BlobConfiguration : IEntityTypeConfiguration<Blob>
             .HasKey(blob => blob.Id)
             .HasName("pk_blobs");
 
+        // properties
         builder
             .Property(blob => blob.Id)
             .HasColumnName("id");
@@ -38,9 +39,11 @@ public sealed class BlobConfiguration : IEntityTypeConfiguration<Blob>
                     .Property(contentHash => contentHash.Value)
                     .HasColumnName("hash")
                     .HasColumnType("varbinary(32)")
+                    .HasMaxLength(32)
                     .IsRequired();
             });
 
+        // indexes
         builder
             .HasIndex(blob => blob.Hash.Value)
             .IsUnique()

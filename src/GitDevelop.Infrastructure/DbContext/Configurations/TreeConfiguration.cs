@@ -17,6 +17,7 @@ public class TreeConfiguration : IEntityTypeConfiguration<Tree>
             .HasKey(tree => tree.Id)
             .HasName("pk_trees");
 
+        // properties
         builder
             .Property(tree => tree.Id)
             .HasColumnName("tree_id")
@@ -32,11 +33,7 @@ public class TreeConfiguration : IEntityTypeConfiguration<Tree>
                     .IsRequired();
             });
 
-        builder
-            .HasIndex(tree => tree.Hash.Value)
-            .IsUnique()
-            .HasDatabaseName("ux_trees_hash");
-
+        // ownerships
         builder
             .OwnsMany(tree => tree.Entries, entries =>
             {
@@ -73,5 +70,11 @@ public class TreeConfiguration : IEntityTypeConfiguration<Tree>
                     .IsUnique()
                     .HasDatabaseName("ix_tree_entries_tree_name");
             });
+
+        //indexes
+        builder
+            .HasIndex(tree => tree.Hash.Value)
+            .IsUnique()
+            .HasDatabaseName("ux_trees_hash");
     }
 }
