@@ -6,6 +6,11 @@ public sealed class Tree
     public IReadOnlyCollection<TreeEntry> Entries { get; private init; }
     public ContentHash Hash { get; private init; }
 
+    //ED only
+    private Tree()
+    {
+    }
+
     public Tree(
         Guid id,
         IReadOnlyCollection<TreeEntry> entries,

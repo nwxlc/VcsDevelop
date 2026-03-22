@@ -3,29 +3,29 @@ namespace GitDevelop.Domain.Entities;
 public sealed class Commit
 {
     public Guid Id { get; private init; }
-    public Guid DocumentId { get; private init; }
+    public Guid RepositoryId { get; private init; }
     public Guid RootTreeId { get; private init; }
     public IReadOnlyCollection<Guid> ParentIds { get; private init; }
-    public Author Author { get; private init; }
+    public Guid AuthorId { get; private init; }
     public CommitMessage Message { get; private init; }
     public DateTime CreatedAt { get; private init; }
     public ContentHash Hash { get; private init; }
 
     public Commit(
         Guid id,
-        Guid documentId,
+        Guid repositoryId,
         Guid rootTreeId,
         IReadOnlyCollection<Guid> parentIds,
-        Author author,
+        Guid authorId,
         CommitMessage message,
         DateTime createdAt,
         ContentHash hash)
     {
         Id = id;
-        DocumentId = documentId;
+        RepositoryId = repositoryId;
         RootTreeId = rootTreeId;
         ParentIds = parentIds;
-        Author = author;
+        AuthorId = authorId;
         Message = message;
         CreatedAt = createdAt;
         Hash = hash;
