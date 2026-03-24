@@ -23,7 +23,7 @@ public sealed class CommitConfiguration : IEntityTypeConfiguration<Commit>
             .HasColumnName("id");
 
         builder
-            .Property(commit => commit.RepositoryId)
+            .Property(commit => commit.DocumentId)
             .HasColumnName("repository_id")
             .IsRequired();
 
@@ -64,9 +64,9 @@ public sealed class CommitConfiguration : IEntityTypeConfiguration<Commit>
 
         // ownerships
         builder
-            .HasOne<Repository>()
+            .HasOne<Document>()
             .WithMany()
-            .HasForeignKey(commit => commit.RepositoryId)
+            .HasForeignKey(commit => commit.DocumentId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("fk_commits_repository");
 
@@ -99,7 +99,7 @@ public sealed class CommitConfiguration : IEntityTypeConfiguration<Commit>
             .HasDatabaseName("ux_commits_hash");
 
         builder
-            .HasIndex(c => c.RepositoryId)
+            .HasIndex(c => c.DocumentId)
             .HasDatabaseName("ix_commits_repository_id");
 
         builder

@@ -1,10 +1,10 @@
 namespace GitDevelop.Domain.Entities;
 
-public sealed class RepositoryTag
+public sealed class DocumentTag
 {
     public string Value { get; private init; }
 
-    public RepositoryTag(string value)
+    public DocumentTag(string value)
     {
         Value = value;
     }

@@ -1,18 +1,18 @@
 namespace GitDevelop.Domain.Entities;
 
-public sealed class RepositoryMetadata
+public sealed class DocumentMetadata
 {
     public string Title { get; set; }
     public string Description { get; set; }
-    public IReadOnlyCollection<RepositoryTag> Tags { get; set; }
+    public IReadOnlyCollection<DocumentTag> Tags { get; set; }
 
-    public RepositoryMetadata(
+    public DocumentMetadata(
         string title,
         string description,
         IReadOnlyCollection<string> tags)
     {
         Title = title;
         Description = description;
-        Tags = tags.Select(tag => new RepositoryTag(tag)).ToArray();
+        Tags = tags.Select(tag => new DocumentTag(tag)).ToArray();
     }
 }
