@@ -2,7 +2,7 @@ using GitDevelop.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace GitDevelop.Infrastructure.DbContext.Configurations;
+namespace GitDevelop.Infrastructure.DbContexts.Configurations;
 
 public sealed class BranchConfiguration : IEntityTypeConfiguration<Branch>
 {
