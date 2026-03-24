@@ -23,8 +23,8 @@ public sealed class BranchConfiguration : IEntityTypeConfiguration<Branch>
 
         // properties
         builder
-            .Property(branch => branch.RepositoryId)
-            .HasColumnName("repository_id")
+            .Property(branch => branch.DocumentId)
+            .HasColumnName("document_id")
             .IsRequired();
 
         builder
@@ -44,17 +44,17 @@ public sealed class BranchConfiguration : IEntityTypeConfiguration<Branch>
             .IsRequired();
 
         builder
-            .HasIndex(b => new { b.RepositoryId, b.Name })
+            .HasIndex(b => new { b.DocumentId, b.Name })
             .IsUnique()
-            .HasDatabaseName("ux_branches_repository_name");
+            .HasDatabaseName("ux_branches_document_name");
 
         // ownerships
         builder
-            .HasOne<Repository>()
+            .HasOne<Document>()
             .WithMany()
-            .HasForeignKey(b => b.RepositoryId)
+            .HasForeignKey(b => b.DocumentId)
             .OnDelete(DeleteBehavior.Restrict)
-            .HasConstraintName("fk_branches_repository");
+            .HasConstraintName("fk_branches_document");
 
         builder
             .HasOne<Commit>()

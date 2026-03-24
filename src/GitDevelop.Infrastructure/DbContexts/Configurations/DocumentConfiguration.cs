@@ -4,44 +4,44 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GitDevelop.Infrastructure.DbContexts.Configurations;
 
-public sealed class RepositoryConfiguration : IEntityTypeConfiguration<Repository>
+public sealed class DocumentConfiguration : IEntityTypeConfiguration<Document>
 {
-    public void Configure(EntityTypeBuilder<Repository> builder)
+    public void Configure(EntityTypeBuilder<Document> builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
         builder
-            .ToTable("repositories");
+            .ToTable("documents");
 
         builder
-            .HasKey(repository => repository.Id)
-            .HasName("pk_repositories");
+            .HasKey(document => document.Id)
+            .HasName("pk_documents");
 
         // properties
         builder
-            .Property(repository => repository.Id)
+            .Property(document => document.Id)
             .HasColumnName("id");
 
         builder
-            .Property(repository => repository.Name)
+            .Property(document => document.Name)
             .HasMaxLength(200)
             .HasColumnName("name")
             .IsRequired();
 
         builder
-            .Property(repository => repository.DefaultBranchName)
+            .Property(document => document.DefaultBranchName)
             .HasMaxLength(120)
             .HasColumnName("default_branch_name")
             .IsRequired();
 
         builder
-            .Property(repository => repository.CreatedAt)
+            .Property(document => document.CreatedAt)
             .HasColumnName("created_at")
             .IsRequired();
 
         // ownerships
         builder
-            .OwnsOne(repository => repository.Metadata, metadata =>
+            .OwnsOne(document => document.Metadata, metadata =>
             {
                 metadata
                     .Property(m => m.Title)
@@ -58,11 +58,11 @@ public sealed class RepositoryConfiguration : IEntityTypeConfiguration<Repositor
                     .OwnsMany(m => m.Tags, tags =>
                     {
                         tags
-                            .ToTable("repository_tags");
+                            .ToTable("document_tags");
 
                         tags
                             .WithOwner()
-                            .HasForeignKey("repository_id");
+                            .HasForeignKey("document_id");
 
                         tags
                             .Property(tag => tag.Value)
@@ -71,7 +71,7 @@ public sealed class RepositoryConfiguration : IEntityTypeConfiguration<Repositor
                             .IsRequired();
 
                         tags
-                            .HasKey("repository_id", nameof(RepositoryTag.Value));
+                            .HasKey("document_id", nameof(DocumentTag.Value));
                     });
             });
     }

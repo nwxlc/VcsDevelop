@@ -10,7 +10,7 @@ public sealed class GitDevelopDbContext : DbContext
     {
     }
 
-    public DbSet<Repository> Repositories => Set<Repository>();
+    public DbSet<Document> Documents => Set<Document>();
     public DbSet<Branch> Branches => Set<Branch>();
     public DbSet<Commit> Commits => Set<Commit>();
     public DbSet<Author> Authors => Set<Author>();
