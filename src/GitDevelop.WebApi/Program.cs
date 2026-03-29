@@ -1,4 +1,4 @@
-using GitDevelop.Infrastructure.Extensions;
+using GitDevelop.WebApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
