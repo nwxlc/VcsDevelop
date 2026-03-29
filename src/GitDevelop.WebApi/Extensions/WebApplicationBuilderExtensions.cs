@@ -1,7 +1,7 @@
 using GitDevelop.Infrastructure.DbContexts;
 using Microsoft.EntityFrameworkCore;
 
-namespace GitDevelop.Infrastructure.Extensions;
+namespace GitDevelop.WebApi.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {
@@ -9,6 +9,8 @@ public static class WebApplicationBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(service);
         ArgumentNullException.ThrowIfNull(configuration);
+
+        service.AddOpenApi();
 
         service.AddDbContext<GitDevelopDbContext>(ConfigureNpgsql);
         
