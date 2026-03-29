@@ -2,5 +2,6 @@
   <Folder Name="/src/">
     <Project Path="src/GitDevelop.Domain/GitDevelop.Domain.csproj" />
     <Project Path="src/GitDevelop.Infrastructure/GitDevelop.Infrastructure.csproj" />
+    <Project Path="src/GitDevelop.WebApi/GitDevelop.WebApi.csproj" />
   </Folder>
 </Solution>
