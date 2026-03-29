@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <RootNamespace>GitDevelop.Infrastructure</RootNamespace>
@@ -15,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\GitDevelop.Application\GitDevelop.Application.csproj" />
         <ProjectReference Include="..\GitDevelop.Domain\GitDevelop.Domain.csproj"/>
     </ItemGroup>
 
