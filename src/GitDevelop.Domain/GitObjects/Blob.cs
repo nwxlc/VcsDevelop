@@ -1,4 +1,4 @@
-namespace GitDevelop.Domain.Entities;
+namespace GitDevelop.Domain.GitObjects;
 
 public class Blob
 {
@@ -6,6 +6,12 @@ public class Blob
     public ContentHash Hash { get; private init; }
     public long Size { get; private init; }
     public DateTime CreatedAt { get; private init; }
+
+    // EF Only
+    private Blob()
+    {
+        Hash = null!;
+    }
 
     public Blob(
         Guid id,

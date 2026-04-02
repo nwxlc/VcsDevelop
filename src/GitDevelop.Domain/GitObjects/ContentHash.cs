@@ -1,4 +1,4 @@
-namespace GitDevelop.Domain.Entities;
+namespace GitDevelop.Domain.GitObjects;
 
 public sealed class ContentHash
 {

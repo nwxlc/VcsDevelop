@@ -1,4 +1,4 @@
-namespace GitDevelop.Domain.Entities;
+namespace GitDevelop.Domain.GitObjects;
 
 public sealed class Document
 {
@@ -8,7 +8,13 @@ public sealed class Document
     public DocumentMetadata Metadata { get; private init; }
     public DateTime CreatedAt { get; private init; }
 
-    public Document(
+    // EF only
+    private Document()
+    {
+        Metadata = null!;
+    }
+
+    private Document(
         Guid id,
         string name,
         string defaultBranchName,
@@ -20,5 +26,20 @@ public sealed class Document
         DefaultBranchName = defaultBranchName;
         Metadata = metadata;
         CreatedAt = createdAt;
+    }
+
+    public static Document Create(
+        string name,
+        string defaultBranchName,
+        DocumentMetadata metadata)
+    {
+        var createdAt = DateTime.UtcNow;
+
+        return new Document(
+            Guid.NewGuid(),
+            name,
+            defaultBranchName,
+            metadata,
+            createdAt);
     }
 }

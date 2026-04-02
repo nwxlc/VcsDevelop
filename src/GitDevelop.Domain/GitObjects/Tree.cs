@@ -1,14 +1,16 @@
-namespace GitDevelop.Domain.Entities;
+namespace GitDevelop.Domain.GitObjects;
 
 public sealed class Tree
 {
     public Guid Id { get; private init; }
-    public IReadOnlyCollection<TreeEntry> Entries { get; private init; }
+    public IReadOnlyCollection<TreeEntry> Entries { get; private set; }
     public ContentHash Hash { get; private init; }
 
-    //ED only
+    // EF only
     private Tree()
     {
+        Entries = new HashSet<TreeEntry>();
+        Hash = null!;
     }
 
     public Tree(

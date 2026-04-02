@@ -1,4 +1,4 @@
-using GitDevelop.Domain.Entities;
+using GitDevelop.Domain.GitObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
