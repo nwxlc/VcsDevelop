@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import background from "../../assets/images/image-2.png"
+import info1 from "../../assets/images/image-1.png"
+import info2 from "../../assets/images/image-3.png"
 class HomePageBody extends Component {
     render() {
         return (
@@ -10,11 +12,33 @@ class HomePageBody extends Component {
                         VSC-X
                     </h1>
                 </div>
-                <div className="home-description">
+                <p className="home-block">
                     Лучшее рабочее пространство для контроля версий <br/> и совместной разработки
-                </div>
+                </p>
                 <div className="home-backgroundImage bounce-box">
                     <img src={background} alt=""/>
+                </div>
+                
+                <div className="home-block home-info home-info-first">
+                    <div className="home-info-img">
+                        <img src={info1} alt=""/>
+                    </div>
+                    <div className="home-info-text">
+                        <p>
+                            работайте из любой точки планеты. быстрый и стабильный доступ к вашим проектам и инструменты для контроля версий.
+                        </p>
+                    </div>
+                </div>
+
+                <div className="home-block home-info home-info-second">
+                    <div className="home-info-text">
+                        <p>
+                            делегируйте рабочий процесс своим коллегам и делитесь проектами за считанные секунды без лишних действий.
+                        </p>
+                    </div>
+                    <div className="home-info-img">
+                        <img src={info2} alt=""/>
+                    </div>
                 </div>
             </div>
         );

@@ -90,6 +90,7 @@ legend {
 
 input[type='file'] {
   max-width: 100%;
+  max-width: 100%;
 }
 
 
@@ -102,4 +103,9 @@ input[type='file'] {
    color: white;
    font-family: "Sansation", sans-serif;
    text-transform: lowercase;
+   min-height: 100%;
+ }
+
+ img {
+   pointer-events: none;
  }

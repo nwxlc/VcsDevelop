@@ -1,12 +1,15 @@
 import './App.css'
-import Header from "./components/GlobalComponents/Header.tsx";
-import HomePageBody from "./components/HomePage/HomePageBody.tsx";
+
+import HomePage from "./pages/HomePage.tsx";
+import Login from "./pages/Login.tsx";
+import {Routes, Route} from "react-router";
+
 function App() {
   return (
-      <div className="container">
-          <Header/>
-          <HomePageBody/>     
-      </div>
+    <Routes>
+        <Route path="/" element={<HomePage/>}/>
+        <Route path="/login" element={<Login/>}/>
+    </Routes>
   )
 }
 
