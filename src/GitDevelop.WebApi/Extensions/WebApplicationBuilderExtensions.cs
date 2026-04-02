@@ -12,7 +12,12 @@ public static class WebApplicationBuilderExtensions
 
         service.AddOpenApi();
 
+        service.AddAuthentication(configuration);
+
         service.AddRepository();
+
+        service.AddTokenProvider(configuration);
+
         service.AddDbContext<GitDevelopDbContext>(ConfigureNpgsql);
 
         return service;

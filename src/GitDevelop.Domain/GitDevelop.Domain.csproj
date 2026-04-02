@@ -4,4 +4,8 @@
         <RootNamespace>GitDevelop.Domain</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="BCrypt.Net-Next" />
+    </ItemGroup>
+
 </Project>
