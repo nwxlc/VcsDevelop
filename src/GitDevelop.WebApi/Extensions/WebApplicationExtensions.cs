@@ -8,9 +8,18 @@ public static class WebApplicationExtensions
     {
         ArgumentNullException.ThrowIfNull(app);
 
+        app.UseHttpsRedirection();
+
         app.MapOpenApi();
         app.MapScalarApiReference();
         
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.UseRouting();
+
+        app.MapControllers();
+
         return app;
     }
 }
