@@ -109,3 +109,11 @@ input[type='file'] {
  img {
    pointer-events: none;
  }
+
+input {
+  border-radius: 25px;
+  border: 3px solid white;
+  color: white;
+  padding: 10px 15px;
+  outline: none;
+}
