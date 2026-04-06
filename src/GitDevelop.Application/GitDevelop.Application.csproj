@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+      <ProjectReference Include="..\GitDevelop.Core\GitDevelop.Core.csproj" />
+      <ProjectReference Include="..\GitDevelop.Domain\GitDevelop.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="GitObjects\" />
+    </ItemGroup>
+
+</Project>

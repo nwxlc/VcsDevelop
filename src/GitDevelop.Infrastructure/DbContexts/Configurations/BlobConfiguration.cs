@@ -1,4 +1,4 @@
-using GitDevelop.Domain.Entities;
+using GitDevelop.Domain.GitObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -33,20 +33,28 @@ public sealed class BlobConfiguration : IEntityTypeConfiguration<Blob>
             .IsRequired();
 
         builder
+            .Property<byte[]>("HashValue")
+            .HasColumnName("hash")
+            .HasColumnType("bytea")
+            .HasMaxLength(32)
+            .IsRequired();
+
+        // indexes
+        builder
+            .HasIndex("HashValue")
+            .IsUnique()
+            .HasDatabaseName("ux_blobs_hash");
+
+        // complex property
+        builder
             .ComplexProperty(blob => blob.Hash, hash =>
             {
                 hash
                     .Property(contentHash => contentHash.Value)
                     .HasColumnName("hash")
-                    .HasColumnType("varbinary(32)")
+                    .HasColumnType("bytea")
                     .HasMaxLength(32)
                     .IsRequired();
             });
-
-        // indexes
-        builder
-            .HasIndex(blob => blob.Hash.Value)
-            .IsUnique()
-            .HasDatabaseName("ux_blobs_hash");
     }
 }
