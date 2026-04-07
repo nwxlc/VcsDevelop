@@ -20,6 +20,7 @@ public static class TokenProviderExtensions
         
         services.AddSingleton<ITokenProvider, TokenProvider>();
         services.AddSingleton<ITokenValidationParametersFactory, TokenValidationParametersFactory>();
+        services.AddSingleton<IRefreshTokenProvider, RefreshTokenProvider>();
 
         services.AddSingleton<RequestContext>();
         services.AddSingleton<IRequestContext>(sp => sp.GetRequiredService<RequestContext>());
