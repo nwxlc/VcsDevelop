@@ -7,5 +7,6 @@ public interface ITokenSettings
     string PrivateKey { get; }
     string PublicKey { get; }
     TimeSpan AccessTokenLifetime { get; }
+    TimeSpan RefreshTokenLifetime { get; }
     string AccountIdClaimName { get; }
 }

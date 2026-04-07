@@ -6,20 +6,24 @@ public sealed class AccountResponse
 {
     public Guid AccountId { get; }
     public Token AccessToken { get; }
+    public Token RefreshToken { get; }
 
     private AccountResponse(
         Guid accountId,
-        Token token)
+        Token accessToken,
+        Token refreshToken)
     {
         AccountId = accountId;
-        AccessToken = token;
+        AccessToken = accessToken;
+        RefreshToken = refreshToken;
     }
 
-    public static AccountResponse Create(Account account, Token token)
+    public static AccountResponse Create(Account account, Token accessToken, Token refreshToken)
     {
         ArgumentNullException.ThrowIfNull(account);
-        ArgumentNullException.ThrowIfNull(token);
+        ArgumentNullException.ThrowIfNull(accessToken);
+        ArgumentNullException.ThrowIfNull(refreshToken);
 
-        return new AccountResponse(account.Id, token);
+        return new AccountResponse(account.Id, accessToken, refreshToken);
     }
 }
