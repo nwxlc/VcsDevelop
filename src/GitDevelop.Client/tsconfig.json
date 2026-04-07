@@ -8,6 +8,8 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "allowUnusedLabels": true,
+    "noImplicitAny": false,      
+    "allowJs": true,
     "allowUnreachableCode": true
   }
 
