@@ -1,5 +1,71 @@
-bin/
-obj/
+# Build artifacts
+[Bb]in/
+[Oo]bj/
 /packages/
+
+# IDE and editor files
+.idea/
+*.iml
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
 riderModule.iml
 /_ReSharper.Caches/
+
+# OS files
+.DS_Store
+
+# Local secrets
+*.pem
+
+# Logs and diagnostics
+*.log
+logs/
+TestResults/
+BenchmarkDotNet.Artifacts/
+
+# Local environment overrides
+appsettings.Local.json
+appsettings.*.local.json
+.env
+.env.*
+
+# ASP.NET generated files
+wwwroot/lib/
+
+# Database/cache artifacts
+*.db
+*.sqlite
+*.sqlite3
+
+# Coverage / test tooling
+coverage/
+coverage-report/
+*.coverage
+*.coveragexml
+
+# Profiling / dumps
+*.dmp
+*.dump
+*.stackdump
+
+# Publish output
+publish/
+artifacts/
+
+# Generated client assets, если появится фронтенд
+node_modules/
+dist/
+build/
+
+# Local certificates for ASP.NET
+*.pfx
+*.snk
+
+# User Secrets helper files, если будете хранить локально вне Secret Manager
+secrets.json
+
+# Docker local overrides
+docker-compose.override.yml
