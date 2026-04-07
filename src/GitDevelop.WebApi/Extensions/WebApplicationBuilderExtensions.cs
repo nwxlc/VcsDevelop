@@ -10,10 +10,21 @@ public static class WebApplicationBuilderExtensions
         ArgumentNullException.ThrowIfNull(service);
         ArgumentNullException.ThrowIfNull(configuration);
 
+        service.AddControllers();
+
         service.AddOpenApi();
 
+        service.AddAuthentication(configuration);
+
+        service.AddRepository();
+
+        service.AddHandlers();
+
+        service.AddHttpContextAccessor();
+        service.AddTokenProvider(configuration);
+
         service.AddDbContext<GitDevelopDbContext>(ConfigureNpgsql);
-        
+
         return service;
     }
 
@@ -22,7 +33,7 @@ public static class WebApplicationBuilderExtensions
         DbContextOptionsBuilder optionsBuilder)
     {
         var configuration = sp.GetRequiredService<IConfiguration>();
-        var connectionString = configuration.GetConnectionString("GitDevelop");
+        var connectionString = configuration.GetConnectionString("VCS-X");
 
         optionsBuilder.UseNpgsql(connectionString);
     }

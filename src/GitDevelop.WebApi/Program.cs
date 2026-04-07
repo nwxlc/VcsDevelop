@@ -9,4 +9,11 @@ var app = builder.Build();
 
 app.ConfigureMiddleware();
 
+app.UseDefaultFiles(); 
+app.UseStaticFiles(); 
+
+app.UseRouting();
+
+app.MapFallbackToFile("index.html");
+
 app.Run();

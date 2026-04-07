@@ -1,4 +1,4 @@
-using GitDevelop.Domain.Entities;
+using GitDevelop.Domain.GitObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -29,9 +29,21 @@ public class TreeConfiguration : IEntityTypeConfiguration<Tree>
                 hash
                     .Property(contentHash => contentHash.Value)
                     .HasColumnName("hash")
-                    .HasColumnType("varbinary(32)")
+                    .HasColumnType("bytea")
+                    .HasMaxLength(32)
                     .IsRequired();
             });
+
+        builder
+            .Navigation(tree => tree.Entries)
+            .AutoInclude();
+
+        builder
+            .Property<byte[]>("HashValue")
+            .HasColumnName("hash")
+            .HasColumnType("bytea")
+            .HasMaxLength(32)
+            .IsRequired();
 
         // ownerships
         builder
@@ -66,14 +78,14 @@ public class TreeConfiguration : IEntityTypeConfiguration<Tree>
                     .IsRequired();
 
                 entries
-                    .HasIndex("tree_id", "name")
+                    .HasIndex("tree_id", nameof(TreeEntry.Name))
                     .IsUnique()
                     .HasDatabaseName("ix_tree_entries_tree_name");
             });
 
         //indexes
         builder
-            .HasIndex(tree => tree.Hash.Value)
+            .HasIndex("HashValue")
             .IsUnique()
             .HasDatabaseName("ux_trees_hash");
     }

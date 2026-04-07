@@ -1,4 +1,5 @@
-using GitDevelop.Domain.Entities;
+using GitDevelop.Domain.Accounts;
+using GitDevelop.Domain.GitObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -33,8 +34,8 @@ public sealed class CommitConfiguration : IEntityTypeConfiguration<Commit>
             .IsRequired();
 
         builder
-            .Property(commit => commit.AuthorId)
-            .HasColumnName("author_id")
+            .Property(commit => commit.AccountId)
+            .HasColumnName("account_id")
             .IsRequired();
 
         builder
@@ -43,12 +44,20 @@ public sealed class CommitConfiguration : IEntityTypeConfiguration<Commit>
             .IsRequired();
 
         builder
+            .Property<byte[]>("HashValue")
+            .HasColumnName("hash")
+            .HasColumnType("bytea")
+            .HasMaxLength(32)
+            .IsRequired();
+
+        builder
             .ComplexProperty(commit => commit.Hash, hash =>
             {
                 hash
                     .Property(h => h.Value)
                     .HasColumnName("hash")
-                    .HasColumnType("varbinary(32)")
+                    .HasColumnType("bytea")
+                    .HasMaxLength(32)
                     .IsRequired();
             });
 
@@ -78,23 +87,37 @@ public sealed class CommitConfiguration : IEntityTypeConfiguration<Commit>
             .HasConstraintName("fk_commits_root_tree");
 
         builder
-            .HasOne<Author>()
+            .HasOne<Account>()
             .WithMany()
-            .HasForeignKey(commit => commit.AuthorId)
+            .HasForeignKey(commit => commit.AccountId)
             .OnDelete(DeleteBehavior.Restrict)
-            .HasConstraintName("fk_commits_author");
+            .HasConstraintName("fk_commits_account");
 
-        builder.HasMany<Commit>()
-            .WithMany()
-            .UsingEntity<Dictionary<string, object>>(
-                "commit_parents",
-                l => l.HasOne<Commit>().WithMany().HasForeignKey("parent_id"),
-                r => r.HasOne<Commit>().WithMany().HasForeignKey("commit_id"),
-                j => { j.ToTable("commit_parents"); });
+        builder
+            .OwnsMany(commit => commit.ParentIds, parents =>
+            {
+                parents
+                    .ToTable("commit_parents");
+
+                parents
+                    .WithOwner().HasForeignKey("commit_id");
+
+                parents
+                    .Property(parent => parent.ParentId)
+                    .HasColumnName("parent_id")
+                    .IsRequired();
+
+                parents
+                    .HasKey("commit_id", nameof(CommitParent.ParentId));
+
+                parents
+                    .HasIndex(parent => parent.ParentId)
+                    .HasDatabaseName("ix_commit_parents_parent_id");
+            });
 
         // indexes
         builder
-            .HasIndex(commit => commit.Hash.Value)
+            .HasIndex("HashValue")
             .IsUnique()
             .HasDatabaseName("ux_commits_hash");
 
@@ -103,8 +126,8 @@ public sealed class CommitConfiguration : IEntityTypeConfiguration<Commit>
             .HasDatabaseName("ix_commits_repository_id");
 
         builder
-            .HasIndex(c => c.AuthorId)
-            .HasDatabaseName("ix_commits_author_id");
+            .HasIndex(c => c.AccountId)
+            .HasDatabaseName("ix_commits_account_id");
 
         builder
             .HasIndex(c => c.CreatedAt)
