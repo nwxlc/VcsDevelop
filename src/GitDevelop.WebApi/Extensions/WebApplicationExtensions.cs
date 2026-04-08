@@ -8,7 +8,11 @@ public static class WebApplicationExtensions
     {
         ArgumentNullException.ThrowIfNull(app);
 
-        app.UseHttpsRedirection();
+        var useHttpsRedirection = app.Configuration.GetValue("Http:UseHttpsRedirection", true);
+        if (useHttpsRedirection)
+        {
+            app.UseHttpsRedirection();
+        }
 
         app.MapOpenApi();
         app.MapScalarApiReference();

@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: gitdevelop-postgres
+    environment:
+      POSTGRES_DB: VCS_X
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d VCS_X"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: gitdevelop-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  webapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gitdevelop-webapi
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__VCS-X: Host=postgres;Port=5432;Database=VCS_X;Username=postgres;Password=postgres
+      ConnectionStrings__Redis: redis:6379,abortConnect=false
+      Http__UseHttpsRedirection: "false"
+    ports:
+      - "5050:8080"
+
+volumes:
+  postgres_data:
+  redis_data:
