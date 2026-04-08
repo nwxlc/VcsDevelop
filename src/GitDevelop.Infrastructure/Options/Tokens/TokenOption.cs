@@ -8,5 +8,6 @@ public class TokenOption : ITokenSettings
     public string PrivateKey { get; init; } = string.Empty;
     public string PublicKey { get; init; } = string.Empty;
     public TimeSpan AccessTokenLifetime { get; init; } = TimeSpan.Zero;
+    public TimeSpan RefreshTokenLifetime { get; init; } = TimeSpan.Zero;
     public string AccountIdClaimName => "account_id";
 }

@@ -13,19 +13,23 @@ public sealed class RegistrationCommandHandler : IRegistrationCommandHandler
     private readonly IAccountRepository _accountRepository;
     private readonly IRequestContext _requestContext;
     private readonly ITokenProvider _tokenProvider;
+    private readonly IRefreshTokenProvider _refreshTokenProvider;
 
     public RegistrationCommandHandler(
         IAccountRepository accountRepository,
         IRequestContext requestContext,
-        ITokenProvider tokenProvider)
+        ITokenProvider tokenProvider,
+        IRefreshTokenProvider refreshTokenProvider)
     {
         ArgumentNullException.ThrowIfNull(accountRepository);
         ArgumentNullException.ThrowIfNull(requestContext);
         ArgumentNullException.ThrowIfNull(tokenProvider);
+        ArgumentNullException.ThrowIfNull(refreshTokenProvider);
 
         _accountRepository = accountRepository;
         _requestContext = requestContext;
         _tokenProvider = tokenProvider;
+        _refreshTokenProvider = refreshTokenProvider;
     }
 
     public async Task<AccountResponse> HandleAsync(RegistrationCommand request, CancellationToken cancellationToken)
@@ -40,8 +44,10 @@ public sealed class RegistrationCommandHandler : IRegistrationCommandHandler
         await _accountRepository.SetAsync(account, cancellationToken)
             .ConfigureAwait(false);
 
-        var token = _tokenProvider.CreateToken(account); 
+        var token = _tokenProvider.CreateToken(account);
 
-        return AccountResponse.Create(account, token);
+        var refreshToken = await _refreshTokenProvider.CreateRefreshTokenAsync(account, cancellationToken);
+
+        return AccountResponse.Create(account, token, refreshToken);
     }
 }

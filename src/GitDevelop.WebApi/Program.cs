@@ -7,6 +7,8 @@ builder.Services
 
 var app = builder.Build();
 
+await app.ApplyMigrationsAsync();
+
 app.ConfigureMiddleware();
 
 app.UseDefaultFiles(); 
