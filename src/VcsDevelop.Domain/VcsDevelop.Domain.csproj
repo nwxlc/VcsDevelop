@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>VcsDevelop.Domain</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BCrypt.Net-Next" />
+    </ItemGroup>
+
+</Project>

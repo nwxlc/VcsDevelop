@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+      <RootNamespace>VcsDevelop.Application</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\VcsDevelop.Core\VcsDevelop.Core.csproj" />
+      <ProjectReference Include="..\VcsDevelop.Domain\VcsDevelop.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="VcsObjects\" />
+    </ItemGroup>
+
+</Project>
