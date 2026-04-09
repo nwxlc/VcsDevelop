@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src\VcsDevelop.Application\VcsDevelop.Application.csproj" />
+    <Project Path="src\VcsDevelop.Core\VcsDevelop.Core.csproj" />
+    <Project Path="src\VcsDevelop.Domain\VcsDevelop.Domain.csproj" />
+    <Project Path="src\VcsDevelop.Infrastructure\VcsDevelop.Infrastructure.csproj" />
+    <Project Path="src\VcsDevelop.WebApi\VcsDevelop.WebApi.csproj" />
+  </Folder>
+</Solution>
