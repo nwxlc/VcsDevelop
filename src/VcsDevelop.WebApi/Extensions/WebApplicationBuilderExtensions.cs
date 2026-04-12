@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using VcsDevelop.Infrastructure.DbContexts;
 
 namespace VcsDevelop.WebApi.Extensions;
@@ -9,6 +10,8 @@ public static class WebApplicationBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(service);
         ArgumentNullException.ThrowIfNull(configuration);
+
+        service.AddSerilog();
 
         service.AddControllers();
 

@@ -1,4 +1,5 @@
 using Scalar.AspNetCore;
+using Serilog;
 
 namespace VcsDevelop.WebApi.Extensions;
 
@@ -8,6 +9,8 @@ public static class WebApplicationExtensions
     {
         ArgumentNullException.ThrowIfNull(app);
 
+        app.UseSerilogRequestLogging();
+
         var useHttpsRedirection = app.Configuration.GetValue("Http:UseHttpsRedirection", true);
         if (useHttpsRedirection)
         {
@@ -16,7 +19,7 @@ public static class WebApplicationExtensions
 
         app.MapOpenApi();
         app.MapScalarApiReference();
-        
+
         app.UseAuthentication();
         app.UseAuthorization();
 
