@@ -5,10 +5,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
     .CreateLogger();
 
-builder.Services
-    .AddServices(builder.Configuration);
+builder
+    .AddSerilog()
+    .AddServices();
 
 var app = builder.Build();
 
