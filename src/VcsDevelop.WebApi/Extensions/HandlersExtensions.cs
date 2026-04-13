@@ -11,7 +11,7 @@ public static class HandlersExtensions
         ArgumentNullException.ThrowIfNull(services);
 
         services.AddScoped<IRegistrationCommandHandler, RegistrationCommandHandler>();
-         services.AddScoped<ILoginCommandHandler, LoginCommandHandler>();
+        services.AddScoped<ILoginCommandHandler, LoginCommandHandler>();
 
         return services;
     }
