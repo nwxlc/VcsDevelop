@@ -33,4 +33,14 @@ public sealed class Account
 
         return new Account(Guid.NewGuid(), name, email, password);
     }
+
+    public void CheckPassword(Password password)
+    {
+        ArgumentNullException.ThrowIfNull(password);
+
+        if (!Password.Verify(password))
+        {
+            throw new ArgumentException("Password is incorrect");
+        }
+    }
 }
