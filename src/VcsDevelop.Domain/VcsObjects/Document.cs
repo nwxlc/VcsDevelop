@@ -3,6 +3,7 @@ namespace VcsDevelop.Domain.VcsObjects;
 public sealed class Document
 {
     public Guid Id { get; private init; }
+    public Guid OwnerId { get; private init; }
     public string Name { get; private init; }
     public string DefaultBranchName { get; private init; }
     public DocumentMetadata Metadata { get; private init; }
