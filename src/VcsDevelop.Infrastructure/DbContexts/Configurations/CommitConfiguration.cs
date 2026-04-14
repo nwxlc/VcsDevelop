@@ -21,16 +21,18 @@ public sealed class CommitConfiguration : IEntityTypeConfiguration<Commit>
         // properties
         builder
             .Property(commit => commit.Id)
-            .HasColumnName("id");
+            .HasColumnName("id")
+            .HasColumnType("char(40)");
 
         builder
             .Property(commit => commit.DocumentId)
-            .HasColumnName("repository_id")
+            .HasColumnName("document_id")
             .IsRequired();
 
         builder
             .Property(commit => commit.RootTreeId)
             .HasColumnName("root_tree_id")
+            .HasColumnType("char(40)")
             .IsRequired();
 
         builder
@@ -42,24 +44,6 @@ public sealed class CommitConfiguration : IEntityTypeConfiguration<Commit>
             .Property(commit => commit.CreatedAt)
             .HasColumnName("created_at")
             .IsRequired();
-
-        builder
-            .Property<byte[]>("HashValue")
-            .HasColumnName("hash")
-            .HasColumnType("bytea")
-            .HasMaxLength(32)
-            .IsRequired();
-
-        builder
-            .ComplexProperty(commit => commit.Hash, hash =>
-            {
-                hash
-                    .Property(h => h.Value)
-                    .HasColumnName("hash")
-                    .HasColumnType("bytea")
-                    .HasMaxLength(32)
-                    .IsRequired();
-            });
 
         builder
             .ComplexProperty(commit => commit.Message, propertyBuilder =>
@@ -77,7 +61,7 @@ public sealed class CommitConfiguration : IEntityTypeConfiguration<Commit>
             .WithMany()
             .HasForeignKey(commit => commit.DocumentId)
             .OnDelete(DeleteBehavior.Restrict)
-            .HasConstraintName("fk_commits_repository");
+            .HasConstraintName("fk_commits_document");
 
         builder
             .HasOne<Tree>()
@@ -117,13 +101,8 @@ public sealed class CommitConfiguration : IEntityTypeConfiguration<Commit>
 
         // indexes
         builder
-            .HasIndex("HashValue")
-            .IsUnique()
-            .HasDatabaseName("ux_commits_hash");
-
-        builder
             .HasIndex(c => c.DocumentId)
-            .HasDatabaseName("ix_commits_repository_id");
+            .HasDatabaseName("ix_commits_document_id");
 
         builder
             .HasIndex(c => c.AccountId)

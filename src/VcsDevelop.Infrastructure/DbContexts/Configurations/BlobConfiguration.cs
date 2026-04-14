@@ -20,7 +20,8 @@ public sealed class BlobConfiguration : IEntityTypeConfiguration<Blob>
         // properties
         builder
             .Property(blob => blob.Id)
-            .HasColumnName("id");
+            .HasColumnName("id")
+            .HasColumnType("char(40)");
 
         builder
             .Property(blob => blob.Size)
@@ -31,30 +32,5 @@ public sealed class BlobConfiguration : IEntityTypeConfiguration<Blob>
             .Property(blob => blob.CreatedAt)
             .HasColumnName("created_at")
             .IsRequired();
-
-        builder
-            .Property<byte[]>("HashValue")
-            .HasColumnName("hash")
-            .HasColumnType("bytea")
-            .HasMaxLength(32)
-            .IsRequired();
-
-        // indexes
-        builder
-            .HasIndex("HashValue")
-            .IsUnique()
-            .HasDatabaseName("ux_blobs_hash");
-
-        // complex property
-        builder
-            .ComplexProperty(blob => blob.Hash, hash =>
-            {
-                hash
-                    .Property(contentHash => contentHash.Value)
-                    .HasColumnName("hash")
-                    .HasColumnType("bytea")
-                    .HasMaxLength(32)
-                    .IsRequired();
-            });
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using VcsDevelop.Domain.Accounts;
 using VcsDevelop.Domain.VcsObjects;
 
 namespace VcsDevelop.Infrastructure.DbContexts.Configurations;
@@ -23,6 +24,11 @@ public sealed class DocumentConfiguration : IEntityTypeConfiguration<Document>
             .HasColumnName("id");
 
         builder
+            .Property(document => document.OwnerId)
+            .HasColumnName("owner_id")
+            .IsRequired();
+
+        builder
             .Property(document => document.Name)
             .HasMaxLength(200)
             .HasColumnName("name")
@@ -40,6 +46,13 @@ public sealed class DocumentConfiguration : IEntityTypeConfiguration<Document>
             .IsRequired();
 
         // ownerships
+        builder
+            .HasOne<Account>()
+            .WithMany()
+            .HasForeignKey(document => document.OwnerId)
+            .HasConstraintName("fk_documents_accounts_owner_id")
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder
             .OwnsOne(document => document.Metadata, metadata =>
             {
@@ -74,5 +87,11 @@ public sealed class DocumentConfiguration : IEntityTypeConfiguration<Document>
                             .HasKey("document_id", nameof(DocumentTag.Value));
                     });
             });
+
+        //indexes
+        builder
+            .HasIndex(document => new { document.OwnerId, document.Name })
+            .IsUnique()
+            .HasDatabaseName("ix_documents_owner_id_name");
     }
 }

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace VcsDevelop.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialModels : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,10 +30,9 @@ namespace VcsDevelop.Infrastructure.Migrations
                 name: "blobs",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<string>(type: "char(40)", nullable: false),
                     size = table.Column<long>(type: "bigint", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    hash = table.Column<byte[]>(type: "bytea", maxLength: 32, nullable: false)
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -41,10 +40,22 @@ namespace VcsDevelop.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "trees",
+                columns: table => new
+                {
+                    tree_id = table.Column<string>(type: "char(40)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_trees", x => x.tree_id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "documents",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
+                    owner_id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     default_branch_name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
                     metadata_title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
@@ -54,18 +65,67 @@ namespace VcsDevelop.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_documents", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_documents_accounts_owner_id",
+                        column: x => x.owner_id,
+                        principalTable: "accounts",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "trees",
+                name: "tree_entries",
                 columns: table => new
                 {
-                    tree_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    hash = table.Column<byte[]>(type: "bytea", maxLength: 32, nullable: false)
+                    tree_id = table.Column<string>(type: "char(40)", nullable: false),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    object_id = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_trees", x => x.tree_id);
+                    table.PrimaryKey("pk_tree_entries", x => new { x.tree_id, x.id });
+                    table.ForeignKey(
+                        name: "FK_tree_entries_trees_tree_id",
+                        column: x => x.tree_id,
+                        principalTable: "trees",
+                        principalColumn: "tree_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "commits",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "char(40)", nullable: false),
+                    document_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    root_tree_id = table.Column<string>(type: "char(40)", nullable: false),
+                    account_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    message = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_commits", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_commits_account",
+                        column: x => x.account_id,
+                        principalTable: "accounts",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_commits_document",
+                        column: x => x.document_id,
+                        principalTable: "documents",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_commits_root_tree",
+                        column: x => x.root_tree_id,
+                        principalTable: "trees",
+                        principalColumn: "tree_id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -87,69 +147,13 @@ namespace VcsDevelop.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "commits",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    repository_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    root_tree_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    account_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    hash = table.Column<byte[]>(type: "bytea", maxLength: 32, nullable: false),
-                    message = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_commits", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_commits_account",
-                        column: x => x.account_id,
-                        principalTable: "accounts",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "fk_commits_repository",
-                        column: x => x.repository_id,
-                        principalTable: "documents",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "fk_commits_root_tree",
-                        column: x => x.root_tree_id,
-                        principalTable: "trees",
-                        principalColumn: "tree_id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "tree_entries",
-                columns: table => new
-                {
-                    tree_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    object_id = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_tree_entries", x => new { x.tree_id, x.id });
-                    table.ForeignKey(
-                        name: "FK_tree_entries_trees_tree_id",
-                        column: x => x.tree_id,
-                        principalTable: "trees",
-                        principalColumn: "tree_id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "branches",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     document_id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
-                    head_commit_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    head_commit_id = table.Column<string>(type: "char(40)", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -173,8 +177,8 @@ namespace VcsDevelop.Infrastructure.Migrations
                 name: "commit_parents",
                 columns: table => new
                 {
-                    parent_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    commit_id = table.Column<Guid>(type: "uuid", nullable: false)
+                    parent_id = table.Column<string>(type: "text", nullable: false),
+                    commit_id = table.Column<string>(type: "char(40)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -191,12 +195,6 @@ namespace VcsDevelop.Infrastructure.Migrations
                 name: "ux_accounts_email",
                 table: "accounts",
                 column: "email",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "ux_blobs_hash",
-                table: "blobs",
-                column: "hash",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -226,9 +224,9 @@ namespace VcsDevelop.Infrastructure.Migrations
                 column: "created_at");
 
             migrationBuilder.CreateIndex(
-                name: "ix_commits_repository_id",
+                name: "ix_commits_document_id",
                 table: "commits",
-                column: "repository_id");
+                column: "document_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_commits_root_tree_id",
@@ -236,21 +234,15 @@ namespace VcsDevelop.Infrastructure.Migrations
                 column: "root_tree_id");
 
             migrationBuilder.CreateIndex(
-                name: "ux_commits_hash",
-                table: "commits",
-                column: "hash",
+                name: "ix_documents_owner_id_name",
+                table: "documents",
+                columns: new[] { "owner_id", "name" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_tree_entries_tree_name",
                 table: "tree_entries",
                 columns: new[] { "tree_id", "name" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "ux_trees_hash",
-                table: "trees",
-                column: "hash",
                 unique: true);
         }
 
@@ -276,13 +268,13 @@ namespace VcsDevelop.Infrastructure.Migrations
                 name: "commits");
 
             migrationBuilder.DropTable(
-                name: "accounts");
-
-            migrationBuilder.DropTable(
                 name: "documents");
 
             migrationBuilder.DropTable(
                 name: "trees");
+
+            migrationBuilder.DropTable(
+                name: "accounts");
         }
     }
 }

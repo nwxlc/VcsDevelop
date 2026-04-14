@@ -65,44 +65,20 @@ namespace VcsDevelop.Infrastructure.Migrations
 
             modelBuilder.Entity("VcsDevelop.Domain.VcsObjects.Blob", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                    b.Property<string>("Id")
+                        .HasColumnType("char(40)")
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<byte[]>("HashValue")
-                        .IsRequired()
-                        .ValueGeneratedOnUpdateSometimes()
-                        .HasMaxLength(32)
-                        .HasColumnType("bytea")
-                        .HasColumnName("hash");
-
                     b.Property<long>("Size")
                         .HasColumnType("bigint")
                         .HasColumnName("size");
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "Hash", "VcsDevelop.Domain.VcsObjects.Blob.Hash#ContentHash", b1 =>
-                        {
-                            b1.IsRequired();
-
-                            b1.Property<byte[]>("Value")
-                                .IsRequired()
-                                .ValueGeneratedOnUpdateSometimes()
-                                .HasMaxLength(32)
-                                .HasColumnType("bytea")
-                                .HasColumnName("hash");
-                        });
-
                     b.HasKey("Id")
                         .HasName("pk_blobs");
-
-                    b.HasIndex("HashValue")
-                        .IsUnique()
-                        .HasDatabaseName("ux_blobs_hash");
 
                     b.ToTable("blobs", (string)null);
                 });
@@ -122,8 +98,9 @@ namespace VcsDevelop.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("document_id");
 
-                    b.Property<Guid>("HeadCommitId")
-                        .HasColumnType("uuid")
+                    b.Property<string>("HeadCommitId")
+                        .IsRequired()
+                        .HasColumnType("char(40)")
                         .HasColumnName("head_commit_id");
 
                     b.Property<string>("Name")
@@ -146,9 +123,8 @@ namespace VcsDevelop.Infrastructure.Migrations
 
             modelBuilder.Entity("VcsDevelop.Domain.VcsObjects.Commit", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                    b.Property<string>("Id")
+                        .HasColumnType("char(40)")
                         .HasColumnName("id");
 
                     b.Property<Guid>("AccountId")
@@ -161,30 +137,12 @@ namespace VcsDevelop.Infrastructure.Migrations
 
                     b.Property<Guid>("DocumentId")
                         .HasColumnType("uuid")
-                        .HasColumnName("repository_id");
+                        .HasColumnName("document_id");
 
-                    b.Property<byte[]>("HashValue")
+                    b.Property<string>("RootTreeId")
                         .IsRequired()
-                        .ValueGeneratedOnUpdateSometimes()
-                        .HasMaxLength(32)
-                        .HasColumnType("bytea")
-                        .HasColumnName("hash");
-
-                    b.Property<Guid>("RootTreeId")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(40)")
                         .HasColumnName("root_tree_id");
-
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "Hash", "VcsDevelop.Domain.VcsObjects.Commit.Hash#ContentHash", b1 =>
-                        {
-                            b1.IsRequired();
-
-                            b1.Property<byte[]>("Value")
-                                .IsRequired()
-                                .ValueGeneratedOnUpdateSometimes()
-                                .HasMaxLength(32)
-                                .HasColumnType("bytea")
-                                .HasColumnName("hash");
-                        });
 
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Message", "VcsDevelop.Domain.VcsObjects.Commit.Message#CommitMessage", b1 =>
                         {
@@ -206,11 +164,7 @@ namespace VcsDevelop.Infrastructure.Migrations
                         .HasDatabaseName("ix_commits_created_at");
 
                     b.HasIndex("DocumentId")
-                        .HasDatabaseName("ix_commits_repository_id");
-
-                    b.HasIndex("HashValue")
-                        .IsUnique()
-                        .HasDatabaseName("ux_commits_hash");
+                        .HasDatabaseName("ix_commits_document_id");
 
                     b.HasIndex("RootTreeId");
 
@@ -240,44 +194,28 @@ namespace VcsDevelop.Infrastructure.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("name");
 
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("owner_id");
+
                     b.HasKey("Id")
                         .HasName("pk_documents");
+
+                    b.HasIndex("OwnerId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_documents_owner_id_name");
 
                     b.ToTable("documents", (string)null);
                 });
 
             modelBuilder.Entity("VcsDevelop.Domain.VcsObjects.Tree", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                    b.Property<string>("Id")
+                        .HasColumnType("char(40)")
                         .HasColumnName("tree_id");
-
-                    b.Property<byte[]>("HashValue")
-                        .IsRequired()
-                        .ValueGeneratedOnUpdateSometimes()
-                        .HasMaxLength(32)
-                        .HasColumnType("bytea")
-                        .HasColumnName("hash");
-
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "Hash", "VcsDevelop.Domain.VcsObjects.Tree.Hash#ContentHash", b1 =>
-                        {
-                            b1.IsRequired();
-
-                            b1.Property<byte[]>("Value")
-                                .IsRequired()
-                                .ValueGeneratedOnUpdateSometimes()
-                                .HasMaxLength(32)
-                                .HasColumnType("bytea")
-                                .HasColumnName("hash");
-                        });
 
                     b.HasKey("Id")
                         .HasName("pk_trees");
-
-                    b.HasIndex("HashValue")
-                        .IsUnique()
-                        .HasDatabaseName("ux_trees_hash");
 
                     b.ToTable("trees", (string)null);
                 });
@@ -313,7 +251,7 @@ namespace VcsDevelop.Infrastructure.Migrations
                         .HasForeignKey("DocumentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_commits_repository");
+                        .HasConstraintName("fk_commits_document");
 
                     b.HasOne("VcsDevelop.Domain.VcsObjects.Tree", null)
                         .WithMany()
@@ -324,12 +262,11 @@ namespace VcsDevelop.Infrastructure.Migrations
 
                     b.OwnsMany("VcsDevelop.Domain.VcsObjects.CommitParent", "ParentIds", b1 =>
                         {
-                            b1.Property<Guid>("commit_id")
-                                .HasColumnType("uuid");
+                            b1.Property<string>("commit_id")
+                                .HasColumnType("char(40)");
 
-                            b1.Property<Guid>("ParentId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("uuid")
+                            b1.Property<string>("ParentId")
+                                .HasColumnType("text")
                                 .HasColumnName("parent_id");
 
                             b1.HasKey("commit_id", "ParentId");
@@ -348,6 +285,13 @@ namespace VcsDevelop.Infrastructure.Migrations
 
             modelBuilder.Entity("VcsDevelop.Domain.VcsObjects.Document", b =>
                 {
+                    b.HasOne("VcsDevelop.Domain.Accounts.Account", null)
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_documents_accounts_owner_id");
+
                     b.OwnsOne("VcsDevelop.Domain.VcsObjects.DocumentMetadata", "Metadata", b1 =>
                         {
                             b1.Property<Guid>("DocumentId")
@@ -401,8 +345,8 @@ namespace VcsDevelop.Infrastructure.Migrations
                 {
                     b.OwnsMany("VcsDevelop.Domain.VcsObjects.TreeEntry", "Entries", b1 =>
                         {
-                            b1.Property<Guid>("tree_id")
-                                .HasColumnType("uuid");
+                            b1.Property<string>("tree_id")
+                                .HasColumnType("char(40)");
 
                             b1.Property<int>("id")
                                 .ValueGeneratedOnAdd()

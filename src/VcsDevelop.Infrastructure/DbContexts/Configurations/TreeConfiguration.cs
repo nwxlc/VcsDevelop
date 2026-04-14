@@ -21,29 +21,12 @@ public class TreeConfiguration : IEntityTypeConfiguration<Tree>
         builder
             .Property(tree => tree.Id)
             .HasColumnName("tree_id")
+            .HasColumnType("char(40)")
             .IsRequired();
-
-        builder
-            .ComplexProperty(tree => tree.Hash, hash =>
-            {
-                hash
-                    .Property(contentHash => contentHash.Value)
-                    .HasColumnName("hash")
-                    .HasColumnType("bytea")
-                    .HasMaxLength(32)
-                    .IsRequired();
-            });
 
         builder
             .Navigation(tree => tree.Entries)
             .AutoInclude();
-
-        builder
-            .Property<byte[]>("HashValue")
-            .HasColumnName("hash")
-            .HasColumnType("bytea")
-            .HasMaxLength(32)
-            .IsRequired();
 
         // ownerships
         builder
@@ -82,11 +65,5 @@ public class TreeConfiguration : IEntityTypeConfiguration<Tree>
                     .IsUnique()
                     .HasDatabaseName("ix_tree_entries_tree_name");
             });
-
-        //indexes
-        builder
-            .HasIndex("HashValue")
-            .IsUnique()
-            .HasDatabaseName("ux_trees_hash");
     }
 }
