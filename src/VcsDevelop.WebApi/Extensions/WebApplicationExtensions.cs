@@ -17,13 +17,13 @@ public static class WebApplicationExtensions
             app.UseHttpsRedirection();
         }
 
-        app.MapOpenApi();
-        app.MapScalarApiReference();
+        app.UseRouting();
 
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.UseRouting();
+        app.MapOpenApi();
+        app.MapScalarApiReference();
 
         app.MapControllers();
 
