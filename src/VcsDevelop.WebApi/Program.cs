@@ -1,9 +1,16 @@
+using Serilog;
 using VcsDevelop.WebApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services
-    .AddServices(builder.Configuration);
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder
+    .AddSerilog()
+    .AddServices();
 
 var app = builder.Build();
 

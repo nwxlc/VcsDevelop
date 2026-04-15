@@ -24,6 +24,19 @@ public sealed class AccountRepository : BaseRepository, IAccountRepository
             .ConfigureAwait(false);
     }
 
+    public async Task<Account> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(email);
+
+        var account = await _dbContext.Accounts
+            .SingleOrDefaultAsync(
+                account => account.Email == email,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        return account ?? throw new ArgumentException("Either accountId or email must be provided");
+    }
+
     public async Task SetAsync(Account account, CancellationToken cancellationToken = default)
     {
         if (_dbContext.ChangeTracker.Entries<Account>().All(a => a.Entity.Id != account.Id))

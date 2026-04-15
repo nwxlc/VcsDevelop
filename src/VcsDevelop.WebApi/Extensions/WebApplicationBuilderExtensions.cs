@@ -5,7 +5,16 @@ namespace VcsDevelop.WebApi.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {
-    public static IServiceCollection AddServices(this IServiceCollection service, IConfiguration configuration)
+    public static WebApplicationBuilder AddServices(this WebApplicationBuilder app)
+    {
+        ArgumentNullException.ThrowIfNull(app);
+
+        app.Services.AddServices(app.Configuration);
+
+        return app;
+    }
+
+    private static IServiceCollection AddServices(this IServiceCollection service, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(service);
         ArgumentNullException.ThrowIfNull(configuration);
