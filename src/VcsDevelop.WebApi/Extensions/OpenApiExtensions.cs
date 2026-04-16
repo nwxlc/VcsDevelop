@@ -18,7 +18,7 @@ public static class OpenApiExtensions
                     Type = SecuritySchemeType.Http,
                     Name = "Authorization",
                     In = ParameterLocation.Header,
-                    Scheme = "bearer",
+                    Scheme = "Bearer",
                     BearerFormat = "JWT",
                     Description = "Введите ваш JWT токен"
                 };
