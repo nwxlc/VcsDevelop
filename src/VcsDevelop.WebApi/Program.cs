@@ -18,4 +18,11 @@ await app.ApplyMigrationsAsync();
 
 app.ConfigureMiddleware();
 
+app.UseDefaultFiles(); 
+app.UseStaticFiles(); 
+
+app.UseRouting();
+
+app.MapFallbackToFile("index.html");
+
 app.Run();
