@@ -4,5 +4,10 @@ namespace VcsDevelop.Application.VcsObjects.Repositories;
 
 public interface IDocumentRepository
 {
-    Task SetAsync(Document document, CancellationToken cancellationToken = default); 
+    Task<Document?> FindByNameAndOwnerAsync(
+        string name,
+        Guid ownerId,
+        CancellationToken cancellationToken);
+
+    Task SetAsync(Document document, CancellationToken cancellationToken = default);
 }

@@ -1,7 +1,9 @@
 using StackExchange.Redis;
 using VcsDevelop.Application.Accounts.Repositories;
+using VcsDevelop.Application.VcsObjects.Repositories;
 using VcsDevelop.Infrastructure.Auth;
 using VcsDevelop.Infrastructure.Repositories.Accounts;
+using VcsDevelop.Infrastructure.Repositories.VcsObjects;
 
 namespace VcsDevelop.WebApi.Extensions;
 
@@ -13,6 +15,8 @@ public static class RepositoryExtension
         ArgumentNullException.ThrowIfNull(services);
 
         services.AddScoped<IAccountRepository, AccountRepository>();
+
+        services.AddScoped<IDocumentRepository, DocumentRepository>();
 
         services.AddSingleton<IConnectionMultiplexer>(serviceProvider =>
         {
