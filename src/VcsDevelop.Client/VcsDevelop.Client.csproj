@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <OutputType>Library</OutputType>
+        <IsPackable>false</IsPackable>
+        <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
+        <CopyBuildOutputToPublishDirectory>false</CopyBuildOutputToPublishDirectory>
+        <NoBuild>true</NoBuild>
+        <RootNamespace>GitDevelop.Client</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Remove="node_modules\**" />
+        <None Include="node_modules\**" Pack="false" />
+    </ItemGroup>
+</Project>
