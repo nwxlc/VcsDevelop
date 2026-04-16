@@ -9,6 +9,7 @@
         <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
         <CopyBuildOutputToPublishDirectory>false</CopyBuildOutputToPublishDirectory>
         <NoBuild>true</NoBuild>
+        <RootNamespace>GitDevelop.Client</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/VcsDevelop.Client/VcsDevelop.Client.csproj" />
     <Project Path="src\VcsDevelop.Application\VcsDevelop.Application.csproj" />
     <Project Path="src\VcsDevelop.Core\VcsDevelop.Core.csproj" />
     <Project Path="src\VcsDevelop.Domain\VcsDevelop.Domain.csproj" />
