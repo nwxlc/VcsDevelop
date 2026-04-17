@@ -34,7 +34,7 @@ public sealed class LoginCommandHandler : ILoginCommandHandler
     public async Task<AccountResponse> HandleAsync(LoginCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-//
+
         var account = await _accountRepository
             .GetByEmailAsync(request.Email, cancellationToken)
             .ConfigureAwait(false);
