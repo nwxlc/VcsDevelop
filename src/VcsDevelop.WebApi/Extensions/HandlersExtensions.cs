@@ -14,6 +14,7 @@ public static class HandlersExtensions
 
         services.AddScoped<IRegistrationCommandHandler, RegistrationCommandHandler>();
         services.AddScoped<ILoginCommandHandler, LoginCommandHandler>();
+        services.AddScoped<ILogoutCommandHandler, LogoutCommandHandler>();
 
         services.AddScoped<ICreateDocumentHandler, CreateDocumentHandler>();
 
