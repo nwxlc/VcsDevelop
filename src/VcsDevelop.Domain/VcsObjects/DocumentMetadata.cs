@@ -3,8 +3,8 @@ namespace VcsDevelop.Domain.VcsObjects;
 public sealed class DocumentMetadata
 {
     public string Title { get; set; }
-    public string Description { get; set; }
-    public IReadOnlyCollection<DocumentTag> Tags { get; set; }
+    public string? Description { get; set; }
+    public IReadOnlyCollection<DocumentTag>? Tags { get; set; }
 
     // EF only
     private DocumentMetadata()
@@ -12,13 +12,23 @@ public sealed class DocumentMetadata
         Tags = new HashSet<DocumentTag>();
     }
 
-    public DocumentMetadata(
+    private DocumentMetadata(
         string title,
-        string description,
-        IReadOnlyCollection<string> tags)
+        string? description,
+        IReadOnlyCollection<string>? tags)
     {
         Title = title;
         Description = description;
-        Tags = tags.Select(tag => new DocumentTag(tag)).ToArray();
+        Tags = tags?.Select(tag => new DocumentTag(tag)).ToArray() ?? [];
+    }
+
+    public static DocumentMetadata Create(
+        string title,
+        string? description,
+        IReadOnlyCollection<string>? tags)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(title);
+
+        return new DocumentMetadata(title, description, tags);
     }
 }
