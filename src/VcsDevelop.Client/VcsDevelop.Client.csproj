@@ -9,11 +9,11 @@
         <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
         <CopyBuildOutputToPublishDirectory>false</CopyBuildOutputToPublishDirectory>
         <NoBuild>true</NoBuild>
-        <RootNamespace>GitDevelop.Client</RootNamespace>
+        <RootNamespace>VcsDevelop.Client</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Remove="node_modules\**" />
-        <None Include="node_modules\**" Pack="false" />
+        <Content Remove="node_modules\**"/>
+        <None Include="node_modules\**" Pack="false"/>
     </ItemGroup>
 </Project>

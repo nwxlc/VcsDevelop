@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import Button from "../GlobalComponents/Button.tsx";
 
 const LoginBody = () => {
@@ -25,8 +25,8 @@ const LoginBody = () => {
     const getEmailData = (emailVal) => {
         if (!emailVal) return null;
         if (!validateEmail(emailVal)) {
-            return { label: "почта указана неверно", className: "status-weak" };
-            
+            return {label: "почта указана неверно", className: "status-weak"};
+
         }
     };
 
@@ -38,15 +38,15 @@ const LoginBody = () => {
         const hasUpper = /[A-Z]/.test(pwd);
 
         if (!hasMinLength || !hasLatin) {
-            return { label: "слишком короткий", className: "status-weak" };
+            return {label: "слишком короткий", className: "status-weak"};
         }
         if (hasUpper && hasNumbers) {
-            return { label: "безопасный", className: "status-safe" };
+            return {label: "безопасный", className: "status-safe"};
         }
         if (hasNumbers) {
-            return { label: "нормальный", className: "status-normal" };
+            return {label: "нормальный", className: "status-normal"};
         }
-        return { label: "слабый", className: "status-weak" };
+        return {label: "слабый", className: "status-weak"};
     };
 
     const emailStatus = getEmailData(email);
@@ -85,7 +85,7 @@ const LoginBody = () => {
                 </span>
             )}
 
-            <Button label="войти" onClick={() => console.log("Login clicked")} />
+            <Button label="войти" onClick={() => console.log("TEST")}/>
         </div>
     );
 };
