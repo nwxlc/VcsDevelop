@@ -17,12 +17,14 @@ public sealed class Document
 
     private Document(
         Guid id,
+        Guid ownerId,
         string name,
         string defaultBranchName,
         DocumentMetadata metadata,
         DateTime createdAt)
     {
         Id = id;
+        OwnerId = ownerId;
         Name = name;
         DefaultBranchName = defaultBranchName;
         Metadata = metadata;
@@ -30,6 +32,7 @@ public sealed class Document
     }
 
     public static Document Create(
+        Guid currentUserId,
         string name,
         string defaultBranchName,
         DocumentMetadata metadata)
@@ -38,6 +41,7 @@ public sealed class Document
 
         return new Document(
             Guid.NewGuid(),
+            currentUserId,
             name,
             defaultBranchName,
             metadata,

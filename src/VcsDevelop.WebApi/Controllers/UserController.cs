@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VcsDevelop.Application.Accounts.Abstractions;
 using VcsDevelop.Application.Accounts.Entities;
@@ -46,5 +47,21 @@ public class UserController : ControllerBase
         var accountResponse = await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 
         return Ok(accountResponse);
+    }
+
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> LogoutAsync(
+        [FromBody]LogoutRequest request,
+        [FromServices]ILogoutCommandHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var command = LogoutCommand.Create(request.RefreshToken);
+        await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
+
+        return NoContent();
     }
 }
