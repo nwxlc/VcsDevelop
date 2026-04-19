@@ -1,4 +1,5 @@
 using Serilog;
+
 using VcsDevelop.WebApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,12 +18,6 @@ var app = builder.Build();
 await app.ApplyMigrationsAsync();
 
 app.ConfigureMiddleware();
-
-app.UseDefaultFiles(); 
-app.UseStaticFiles(); 
-
-app.UseRouting();
-
-app.MapFallbackToFile("index.html");
+app.ConfigureSpa();
 
 app.Run();

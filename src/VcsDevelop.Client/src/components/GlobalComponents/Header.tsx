@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router";
 
 const Header = () => {
     const location = useLocation();
-    
+
     return (
         <div className="header">
             <div className="header-title">
@@ -16,10 +16,10 @@ const Header = () => {
             </div>
             {location.pathname === "/login" ? (<></>) : (
                 <Link to="/login">
-                <Button label={"Авторизация"} onClick={() => {}} />
-            </Link>
+                    <Button label={"Авторизация"} onClick={() => {}} />
+                </Link>
             )}
-            
+
         </div>
     );
 };

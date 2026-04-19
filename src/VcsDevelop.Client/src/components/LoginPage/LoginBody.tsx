@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import Button from "../GlobalComponents/Button.tsx";
+import {Link} from "react-router";
 
 const LoginBody = () => {
     const [password, setPassword] = useState("");
@@ -29,6 +30,10 @@ const LoginBody = () => {
 
         }
     };
+    
+    const handleSubmit = () => {
+        fetch("http://localhost:8080/login", {})
+    }
 
     const getStrengthData = (pwd) => {
         if (!pwd) return null;
@@ -85,7 +90,9 @@ const LoginBody = () => {
                 </span>
             )}
 
-            <Button label="войти" onClick={() => console.log("TEST")}/>
+            <Link to="/workspace">
+                <Button label="войти" onClick={() => {}}/>
+            </Link>
         </div>
     );
 };

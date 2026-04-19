@@ -15,6 +15,7 @@
     color: white;
     background-color: transparent;
     font-size: 16px;
+    width: 100%;
     font-weight: bold;
 }
 
@@ -135,6 +136,7 @@ p {
 }
 
 .footer {
+    text-align: center;
     font-size: 18px;
     margin-top: 100px;
     margin-bottom: 50px;
@@ -170,4 +172,86 @@ p {
 
 .hidden {
     display: none;
+}
+
+
+/* Основной контейнер хедера */
+
+
+/* Иконка бургера */
+.burger-icon {
+    width: 30px;
+    height: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    z-index: 1001; /* Выше меню */
+}
+
+.burger-icon span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background-image: linear-gradient(90deg, #c618d3, #2a12f8);
+    transition: 0.3s;
+}
+
+.burger-icon.open span:nth-child(1) { transform: translateY(8.5px) rotate(45deg); }
+.burger-icon.open span:nth-child(2) { opacity: 0; }
+.burger-icon.open span:nth-child(3) { transform: translateY(-8.5px) rotate(-45deg); }
+
+.side-menu {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 250px;
+    height: 100%;
+    background: #222222;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+    transition: right 0.4s ease;
+    padding: 120px 20px 20px;
+    z-index: 1000;
+}
+
+.side-menu.active {
+    right: 0; 
+}
+
+.side-menu .button:hover {
+    background-color: #f53d3d;
+    color: white;
+}
+
+.side-menu .button {
+    position: absolute;
+    bottom: 20px;
+    max-width: 210px;
+}
+
+.menu-links {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.menu-links a {
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.menu-links a:hover {
+    opacity: 0.8;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
 }
