@@ -26,6 +26,18 @@ public class DocumentRepository : BaseRepository, IDocumentRepository
             .ConfigureAwait(false);
     }
 
+    public async Task<Document?> FindByIdAsync(
+        Guid id,
+        Guid ownerId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Documents
+            .SingleOrDefaultAsync(
+                document => document.Id == id && document.OwnerId == ownerId,
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
     public async Task SetAsync(Document document, CancellationToken cancellationToken = default)
     {
         if (_dbContext.ChangeTracker.Entries<Document>().All(doc => doc.Entity.Id != document.Id))

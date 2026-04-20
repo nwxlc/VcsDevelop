@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VcsDevelop.Application.Accounts.Abstractions;
-using VcsDevelop.Application.Accounts.Entities;
+using VcsDevelop.Application.Accounts.Entities.Models;
 using VcsDevelop.Domain.Accounts;
 using VcsDevelop.Domain.Accounts.Commands;
 using VcsDevelop.WebApi.Contracts;

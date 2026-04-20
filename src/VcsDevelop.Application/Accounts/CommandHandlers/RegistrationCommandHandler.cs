@@ -1,6 +1,6 @@
 using VcsDevelop.Application.Accounts.Abstractions;
 using VcsDevelop.Application.Accounts.Auth;
-using VcsDevelop.Application.Accounts.Entities;
+using VcsDevelop.Application.Accounts.Entities.Models;
 using VcsDevelop.Application.Accounts.Repositories;
 using VcsDevelop.Core.Application;
 using VcsDevelop.Domain.Accounts;
