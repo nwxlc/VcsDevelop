@@ -3,7 +3,7 @@ namespace VcsDevelop.Domain.Accounts;
 public sealed class Account
 {
     public Guid Id { get; private init; }
-    public string Name { get; private init; }
+    public string Name { get; private set; }
     public string Email { get; private init; }
     public Password Password { get; private init; }
     public string? Bio { get; private set; }
@@ -41,8 +41,11 @@ public sealed class Account
         return new Account(Guid.NewGuid(), name, email, password, DateTime.UtcNow);
     }
 
-    public void UpdateProfile(string? bio, string? avatarUrl)
+    public void Update(string name, string? bio, string? avatarUrl)
     {
+        ArgumentException.ThrowIfNullOrEmpty(name);
+
+        Name = name;
         Bio = bio;
         AvatarUrl = avatarUrl;
     }

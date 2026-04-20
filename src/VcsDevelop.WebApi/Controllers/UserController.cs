@@ -5,8 +5,8 @@ using VcsDevelop.Application.Accounts.Entities.Models;
 using VcsDevelop.Application.Accounts.Entities.Queries;
 using VcsDevelop.Domain.Accounts;
 using VcsDevelop.Domain.Accounts.Commands;
-using VcsDevelop.WebApi.Contracts;
-using LoginRequest = VcsDevelop.WebApi.Contracts.LoginRequest;
+using VcsDevelop.WebApi.Contracts.Accounts;
+using LoginRequest = VcsDevelop.WebApi.Contracts.Accounts.LoginRequest;
 
 namespace VcsDevelop.WebApi.Controllers;
 
@@ -83,6 +83,34 @@ public class UserController : ControllerBase
         {
             var response = await handler.HandleAsync(query, cancellationToken).ConfigureAwait(false);
             return Ok(response);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [Authorize]
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdateAsync(
+        Guid id,
+        [FromBody]UpdateAccountRequest request,
+        [FromServices]IUpdateAccountHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var command = UpdateAccountCommand.Create(
+            id,
+            request.Name,
+            request.Bio,
+            request.AvatarUrl);
+
+        try
+        {
+            await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
+            return NoContent();
         }
         catch (KeyNotFoundException)
         {
