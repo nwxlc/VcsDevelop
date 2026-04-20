@@ -6,6 +6,10 @@ public sealed class Account
     public string Name { get; private init; }
     public string Email { get; private init; }
     public Password Password { get; private init; }
+    public string? Bio { get; private set; }
+    public string? AvatarUrl { get; private set; }
+    public DateTime CreatedAt { get; private init; }
+    public bool IsActive { get; private set; }
 
     // EF only
     private Account()
@@ -17,12 +21,15 @@ public sealed class Account
         Guid id,
         string name,
         string email,
-        Password password)
+        Password password,
+        DateTime createdAt)
     {
         Id = id;
         Name = name;
         Email = email;
         Password = password;
+        CreatedAt = createdAt;
+        IsActive = true;
     }
 
     public static Account Create(string name, string email, Password password)
@@ -31,7 +38,13 @@ public sealed class Account
         ArgumentException.ThrowIfNullOrEmpty(name);
         ArgumentNullException.ThrowIfNull(password);
 
-        return new Account(Guid.NewGuid(), name, email, password);
+        return new Account(Guid.NewGuid(), name, email, password, DateTime.UtcNow);
+    }
+
+    public void UpdateProfile(string? bio, string? avatarUrl)
+    {
+        Bio = bio;
+        AvatarUrl = avatarUrl;
     }
 
     public void CheckPassword(Password password)

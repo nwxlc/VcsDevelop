@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VcsDevelop.Application.Accounts.Abstractions;
 using VcsDevelop.Application.Accounts.Entities.Models;
+using VcsDevelop.Application.Accounts.Entities.Queries;
 using VcsDevelop.Domain.Accounts;
 using VcsDevelop.Domain.Accounts.Commands;
 using VcsDevelop.WebApi.Contracts;
@@ -28,7 +29,10 @@ public class UserController : ControllerBase
 
         var accountResponse = await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 
-        return Ok(accountResponse);
+        return CreatedAtAction(
+            "GetById",
+            new { id = accountResponse.AccountId },
+            accountResponse);
     }
 
     [HttpPost("login")]
@@ -63,5 +67,26 @@ public class UserController : ControllerBase
         await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 
         return NoContent();
+    }
+
+    [HttpGet("{id:guid}", Name = "GetById")]
+    public async Task<ActionResult<AccountInfoResponse>> GetByIdAsync(
+        Guid id,
+        [FromServices]IGetAccountByIdHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var query = GetAccountByIdQuery.Create(id);
+
+        try
+        {
+            var response = await handler.HandleAsync(query, cancellationToken).ConfigureAwait(false);
+            return Ok(response);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using VcsDevelop.Infrastructure.DbContexts;
@@ -12,9 +13,11 @@ using VcsDevelop.Infrastructure.DbContexts;
 namespace VcsDevelop.Infrastructure.Migrations
 {
     [DbContext(typeof(VcsDevelopDbContext))]
-    partial class VcsDevelopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260420183018_AddAccountFields")]
+    partial class AddAccountFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

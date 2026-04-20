@@ -33,6 +33,30 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .HasMaxLength(320)
             .IsRequired();
 
+        builder
+            .Property(account => account.Bio)
+            .HasColumnName("bio")
+            .HasMaxLength(1000)
+            .IsRequired(false);
+
+        builder
+            .Property(account => account.AvatarUrl)
+            .HasColumnName("avatar_url")
+            .HasMaxLength(500)
+            .IsRequired(false);
+
+        builder
+            .Property(account => account.CreatedAt)
+            .HasColumnName("created_at")
+            .IsRequired()
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder
+            .Property(account => account.IsActive)
+            .HasColumnName("is_active")
+            .IsRequired()
+            .HasDefaultValue(true);
+
         builder.ComplexProperty(account => account.Password, password =>
         {
             password.Property(p => p.HashedValue)
