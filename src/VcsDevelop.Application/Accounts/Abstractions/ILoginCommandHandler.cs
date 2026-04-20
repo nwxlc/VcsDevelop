@@ -1,4 +1,4 @@
-using VcsDevelop.Application.Accounts.Entities;
+using VcsDevelop.Application.Accounts.Entities.Models;
 using VcsDevelop.Core.Application;
 using VcsDevelop.Domain.Accounts.Commands;
 

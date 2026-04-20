@@ -1,10 +1,10 @@
-using VcsDevelop.Application.VcsObjects.Abstractions;
+using VcsDevelop.Application.VcsObjects.Documents.Abstractions;
 using VcsDevelop.Application.VcsObjects.Repositories;
 using VcsDevelop.Core.Application;
 using VcsDevelop.Domain.VcsObjects;
 using VcsDevelop.Domain.VcsObjects.Commands;
 
-namespace VcsDevelop.Application.VcsObjects.CommandHandlers;
+namespace VcsDevelop.Application.VcsObjects.Documents.CommandHandlers;
 
 public sealed class CreateDocumentHandler : ICreateDocumentHandler
 {
