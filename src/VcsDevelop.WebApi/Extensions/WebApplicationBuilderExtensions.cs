@@ -25,6 +25,8 @@ public static class WebApplicationBuilderExtensions
 
         service.AddAuthentication(configuration);
 
+        service.AddMinioServices(configuration);
+
         service.AddRepository();
 
         service.AddHandlers();
