@@ -29,6 +29,24 @@ services:
       timeout: 3s
       retries: 20
 
+  minio:
+    image: minio/minio:RELEASE.2026-03-25T07-35-41Z
+    container_name: gitdevelop-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
   webapi:
     build:
       context: .
@@ -39,10 +57,17 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      minio:
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__VCS-X: Host=postgres;Port=5432;Database=VCS_X;Username=postgres;Password=postgres
       ConnectionStrings__Redis: redis:6379,abortConnect=false
+      Minio__Endpoint: minio:9000
+      Minio__AccessKey: minioadmin
+      Minio__SecretKey: minioadmin
+      Minio__BucketName: vcsdevelop
+      Minio__Secure: "false"
       Http__UseHttpsRedirection: "false"
     ports:
       - "5050:8080"
@@ -50,3 +75,4 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  minio_data:
