@@ -11,6 +11,7 @@ using LoginRequest = VcsDevelop.WebApi.Contracts.Accounts.LoginRequest;
 namespace VcsDevelop.WebApi.Controllers;
 
 [ApiController]
+[Route("api/account")]
 public class UserController : ControllerBase
 {
     [HttpPost("registration")]
