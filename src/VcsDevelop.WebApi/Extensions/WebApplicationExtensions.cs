@@ -12,8 +12,6 @@ public static class WebApplicationExtensions
 
         app.UseSerilogRequestLogging();
 
-        app.UseProblemDetails();
-
         var useHttpsRedirection = app.Configuration.GetValue("Http:UseHttpsRedirection", true);
         if (useHttpsRedirection)
         {
@@ -24,6 +22,8 @@ public static class WebApplicationExtensions
 
         app.UseAuthentication();
         app.UseAuthorization();
+
+        app.UseProblemDetails();
 
         app.MapOpenApi();
         app.MapScalarApiReference();
