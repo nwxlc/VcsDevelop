@@ -1,3 +1,4 @@
+using Hellang.Middleware.ProblemDetails;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -10,6 +11,8 @@ public static class WebApplicationExtensions
         ArgumentNullException.ThrowIfNull(app);
 
         app.UseSerilogRequestLogging();
+
+        app.UseProblemDetails();
 
         var useHttpsRedirection = app.Configuration.GetValue("Http:UseHttpsRedirection", true);
         if (useHttpsRedirection)
