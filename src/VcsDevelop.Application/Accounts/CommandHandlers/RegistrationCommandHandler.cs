@@ -4,6 +4,7 @@ using VcsDevelop.Application.Accounts.Entities.Models;
 using VcsDevelop.Application.Accounts.Repositories;
 using VcsDevelop.Domain.Accounts;
 using VcsDevelop.Domain.Accounts.Commands;
+using VcsDevelop.Domain.Accounts.Errors;
 
 namespace VcsDevelop.Application.Accounts.CommandHandlers;
 
@@ -35,7 +36,7 @@ public sealed class RegistrationCommandHandler : IRegistrationCommandHandler
 
         if (existingAccount is not null)
         {
-            throw new InvalidOperationException("Email already exists");
+            throw new EmailAlreadyExists();
         }
 
         var account = Account.Create(request.Name, request.Email, request.Password);

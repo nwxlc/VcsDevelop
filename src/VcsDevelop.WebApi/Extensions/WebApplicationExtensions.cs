@@ -1,3 +1,4 @@
+using Hellang.Middleware.ProblemDetails;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -21,6 +22,8 @@ public static class WebApplicationExtensions
 
         app.UseAuthentication();
         app.UseAuthorization();
+
+        app.UseProblemDetails();
 
         app.MapOpenApi();
         app.MapScalarApiReference();

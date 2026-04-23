@@ -8,4 +8,8 @@
       <PackageReference Include="BCrypt.Net-Next" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\VcsDevelop.Core\VcsDevelop.Core.csproj" />
+    </ItemGroup>
+
 </Project>
