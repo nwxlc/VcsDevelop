@@ -9,4 +9,8 @@
       <ProjectReference Include="..\VcsDevelop.Domain\VcsDevelop.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="VcsObjects\Blobs\" />
+    </ItemGroup>
+
 </Project>

@@ -33,4 +33,19 @@ public sealed class BlobRepository : BaseRepository, IBlobRepository
 
         await CommitAsync(cancellationToken).ConfigureAwait(false);
     }
+
+    public async Task RemoveAsync(string id, CancellationToken cancellationToken = default)
+    {
+        var blob = await _dbContext.Blobs
+            .SingleOrDefaultAsync(item => item.Id == id, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (blob is null)
+        {
+            return;
+        }
+
+        _dbContext.Blobs.Remove(blob);
+        await CommitAsync(cancellationToken).ConfigureAwait(false);
+    }
 }
