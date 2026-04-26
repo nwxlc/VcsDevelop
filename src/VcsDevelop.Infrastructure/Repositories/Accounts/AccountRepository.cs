@@ -24,6 +24,13 @@ public sealed class AccountRepository : BaseRepository, IAccountRepository
             .ConfigureAwait(false);
     }
 
+    public async Task<Account?> FindByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Accounts
+            .SingleOrDefaultAsync(account => account.Email == email, cancellationToken)
+            .ConfigureAwait(false);
+    }
+
     public async Task<Account> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(email);

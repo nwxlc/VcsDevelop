@@ -1,15 +1,17 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VcsDevelop.Application.Accounts.Abstractions;
-using VcsDevelop.Application.Accounts.Entities;
+using VcsDevelop.Application.Accounts.Entities.Models;
+using VcsDevelop.Application.Accounts.Entities.Queries;
 using VcsDevelop.Domain.Accounts;
 using VcsDevelop.Domain.Accounts.Commands;
-using VcsDevelop.WebApi.Contracts;
-using LoginRequest = VcsDevelop.WebApi.Contracts.LoginRequest;
+using VcsDevelop.WebApi.Contracts.Accounts;
+using LoginRequest = VcsDevelop.WebApi.Contracts.Accounts.LoginRequest;
 
 namespace VcsDevelop.WebApi.Controllers;
 
 [ApiController]
+[Route("api/account")]
 public class UserController : ControllerBase
 {
     [HttpPost("registration")]
@@ -28,7 +30,10 @@ public class UserController : ControllerBase
 
         var accountResponse = await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 
-        return Ok(accountResponse);
+        return CreatedAtAction(
+            "GetById",
+            new { id = accountResponse.AccountId },
+            accountResponse);
     }
 
     [HttpPost("login")]
@@ -63,5 +68,54 @@ public class UserController : ControllerBase
         await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 
         return NoContent();
+    }
+
+    [HttpGet("{id:guid}", Name = "GetById")]
+    public async Task<ActionResult<AccountInfoResponse>> GetByIdAsync(
+        Guid id,
+        [FromServices]IGetAccountByIdHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var query = GetAccountByIdQuery.Create(id);
+
+        try
+        {
+            var response = await handler.HandleAsync(query, cancellationToken).ConfigureAwait(false);
+            return Ok(response);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [Authorize]
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdateAsync(
+        Guid id,
+        [FromBody]UpdateAccountRequest request,
+        [FromServices]IUpdateAccountHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var command = UpdateAccountCommand.Create(
+            id,
+            request.Name,
+            request.Bio,
+            request.AvatarUrl);
+
+        try
+        {
+            await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
     }
 }

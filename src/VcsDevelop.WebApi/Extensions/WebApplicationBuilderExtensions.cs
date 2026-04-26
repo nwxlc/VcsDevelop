@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using VcsDevelop.Infrastructure.DbContexts;
+using Hellang.Middleware.ProblemDetails;
 
 namespace VcsDevelop.WebApi.Extensions;
 
@@ -25,9 +26,13 @@ public static class WebApplicationBuilderExtensions
 
         service.AddAuthentication(configuration);
 
+        service.AddMinioServices(configuration);
+
         service.AddRepository();
 
         service.AddHandlers();
+
+        service.AddProblemDetails(ProblemDetailsExtensions.Configure);
 
         service.AddHttpContextAccessor();
         service.AddTokenProvider(configuration);

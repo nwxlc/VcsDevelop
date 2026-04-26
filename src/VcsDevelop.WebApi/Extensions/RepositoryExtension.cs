@@ -17,6 +17,10 @@ public static class RepositoryExtension
         services.AddScoped<IAccountRepository, AccountRepository>();
 
         services.AddScoped<IDocumentRepository, DocumentRepository>();
+        services.AddScoped<IBlobRepository, BlobRepository>();
+        services.AddScoped<ITreeRepository, TreeRepository>();
+        services.AddScoped<ICommitRepository, CommitRepository>();
+        services.AddScoped<IBranchRepository, BranchRepository>();
 
         services.AddSingleton<IConnectionMultiplexer>(serviceProvider =>
         {
