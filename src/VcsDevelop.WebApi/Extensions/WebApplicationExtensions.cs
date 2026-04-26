@@ -1,3 +1,5 @@
+using Hellang.Middleware.ProblemDetails;
+using Scalar.AspNetCore;
 using Serilog;
 
 namespace VcsDevelop.WebApi.Extensions;
@@ -11,18 +13,23 @@ public static class WebApplicationExtensions
         app.UseSerilogRequestLogging();
 
         var useHttpsRedirection = app.Configuration.GetValue("Http:UseHttpsRedirection", true);
-        if (useHttpsRedirection) app.UseHttpsRedirection();
-
-        app.UseDefaultFiles();
-        app.UseStaticFiles();
+        if (useHttpsRedirection)
+        {
+            app.UseHttpsRedirection();
+        }
 
         app.UseRouting();
 
         app.UseAuthentication();
         app.UseAuthorization();
 
+        app.UseProblemDetails();
+
+        app.MapOpenApi();
+        app.MapScalarApiReference();
+
         app.MapControllers();
-        
+
         return app;
     }
 }

@@ -1,6 +1,6 @@
 using VcsDevelop.Domain.Accounts;
 
-namespace VcsDevelop.Application.Accounts.Entities;
+namespace VcsDevelop.Application.Accounts.Entities.Models;
 
 public sealed class AccountResponse
 {

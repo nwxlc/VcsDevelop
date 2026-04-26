@@ -1,4 +1,4 @@
-﻿namespace VcsDevelop.Application.Accounts.Entities.Queries;
+namespace VcsDevelop.Application.Accounts.Entities.Queries;
 
 public sealed class GetAccountByIdQuery
 {

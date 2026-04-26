@@ -1,8 +1,7 @@
 using VcsDevelop.Application.Accounts.Abstractions;
 using VcsDevelop.Application.Accounts.Auth;
-using VcsDevelop.Application.Accounts.Entities;
+using VcsDevelop.Application.Accounts.Entities.Models;
 using VcsDevelop.Application.Accounts.Repositories;
-using VcsDevelop.Core.Application;
 using VcsDevelop.Domain.Accounts.Commands;
 
 namespace VcsDevelop.Application.Accounts.CommandHandlers;
@@ -12,23 +11,19 @@ public sealed class LoginCommandHandler : ILoginCommandHandler
     private readonly ITokenProvider _tokenProvider;
     private readonly IRefreshTokenProvider _refreshTokenProvider;
     private readonly IAccountRepository _accountRepository;
-    private readonly IRequestContext _requestContext;
 
     public LoginCommandHandler(
         ITokenProvider tokenProvider,
         IRefreshTokenProvider refreshTokenProvider,
-        IAccountRepository accountRepository,
-        IRequestContext requestContext)
+        IAccountRepository accountRepository)
     {
         ArgumentNullException.ThrowIfNull(tokenProvider);
         ArgumentNullException.ThrowIfNull(refreshTokenProvider);
         ArgumentNullException.ThrowIfNull(accountRepository);
-        ArgumentNullException.ThrowIfNull(requestContext);
 
         _tokenProvider = tokenProvider;
         _refreshTokenProvider = refreshTokenProvider;
         _accountRepository = accountRepository;
-        _requestContext = requestContext;
     }
 
     public async Task<AccountResponse> HandleAsync(LoginCommand request, CancellationToken cancellationToken)

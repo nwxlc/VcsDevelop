@@ -1,4 +1,4 @@
-﻿using VcsDevelop.Application.Accounts.Abstractions;
+using VcsDevelop.Application.Accounts.Abstractions;
 using VcsDevelop.Application.Accounts.Entities.Models;
 using VcsDevelop.Application.Accounts.Entities.Queries;
 using VcsDevelop.Application.Accounts.Repositories;

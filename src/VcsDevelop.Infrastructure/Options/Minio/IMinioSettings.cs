@@ -1,4 +1,4 @@
-﻿namespace VcsDevelop.Infrastructure.Options.Minio;
+namespace VcsDevelop.Infrastructure.Options.Minio;
 
 public interface IMinioSettings
 {

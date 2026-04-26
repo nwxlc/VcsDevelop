@@ -1,4 +1,4 @@
-﻿using VcsDevelop.Core.Errors;
+using VcsDevelop.Core.Errors;
 
 namespace VcsDevelop.Domain.Accounts.Errors;
 

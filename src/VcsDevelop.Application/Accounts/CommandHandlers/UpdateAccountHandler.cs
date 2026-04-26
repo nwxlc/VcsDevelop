@@ -1,4 +1,4 @@
-﻿using VcsDevelop.Application.Accounts.Abstractions;
+using VcsDevelop.Application.Accounts.Abstractions;
 using VcsDevelop.Application.Accounts.Repositories;
 using VcsDevelop.Core.Application;
 using VcsDevelop.Domain.Accounts.Commands;

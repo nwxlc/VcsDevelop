@@ -1,4 +1,4 @@
-namespace VcsDevelop.WebApi.Contracts;
+namespace VcsDevelop.WebApi.Contracts.Accounts;
 
 public sealed class LoginRequest
 {
