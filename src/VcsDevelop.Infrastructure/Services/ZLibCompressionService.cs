@@ -1,5 +1,5 @@
 using System.IO.Compression;
-using VcsDevelop.Application.VcsObjects.Models;
+using VcsDevelop.Application.VcsObjects.Files.Models;
 using VcsDevelop.Application.VcsObjects.Services;
 
 namespace VcsDevelop.Infrastructure.Services;

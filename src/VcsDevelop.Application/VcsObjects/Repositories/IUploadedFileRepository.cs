@@ -1,4 +1,4 @@
-using VcsDevelop.Application.VcsObjects.Models;
+using VcsDevelop.Application.VcsObjects.Files.Models;
 
 namespace VcsDevelop.Application.VcsObjects.Repositories;
 

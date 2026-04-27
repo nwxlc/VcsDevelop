@@ -1,4 +1,4 @@
-namespace VcsDevelop.Domain.VcsObjects.Commands;
+namespace VcsDevelop.Application.VcsObjects.Files.Commands;
 
 public sealed class UploadFileCommand
 {
@@ -17,6 +17,9 @@ public sealed class UploadFileCommand
         Stream stream,
         string fileName)
     {
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+
         return new UploadFileCommand(stream, fileName);
     }
 }

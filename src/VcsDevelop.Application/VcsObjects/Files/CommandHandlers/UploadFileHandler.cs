@@ -1,12 +1,12 @@
-using VcsDevelop.Application.VcsObjects.Documents.Abstractions;
-using VcsDevelop.Application.VcsObjects.Models;
+using VcsDevelop.Application.VcsObjects.Files.Abstractions;
+using VcsDevelop.Application.VcsObjects.Files.Commands;
+using VcsDevelop.Application.VcsObjects.Files.Models;
 using VcsDevelop.Application.VcsObjects.Repositories;
 using VcsDevelop.Application.VcsObjects.Services;
 using VcsDevelop.Core.Application;
 using Blob = VcsDevelop.Domain.VcsObjects.Blob;
-using VcsDevelop.Domain.VcsObjects.Commands;
 
-namespace VcsDevelop.Application.VcsObjects.Documents.CommandHandlers;
+namespace VcsDevelop.Application.VcsObjects.Files.CommandHandlers;
 
 public sealed class UploadFileHandler : IUploadFileHandler
 {
@@ -48,31 +48,40 @@ public sealed class UploadFileHandler : IUploadFileHandler
         ArgumentNullException.ThrowIfNull(request.Stream);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.FileName);
 
-        //todo добавить логику "транзакции", т.е. откатывать все если не прошло 
+        // Temporary file is cleaned up via PreparedUploadFile.DisposeAsync.
         await using var preparedUploadFile = await PrepareAsync(
                 request.Stream,
                 request.FileName,
                 cancellationToken)
             .ConfigureAwait(false);
 
-        var storageFileAsync = await StorageFileAsync(
+        var storedFile = await StorageFileAsync(
                 preparedUploadFile,
                 cancellationToken)
             .ConfigureAwait(false);
 
-        var reference = await AddUploadedFileReferenceAsync(
-                _requestContext.GetRequiredAccountId(),
-                storageFileAsync,
-                preparedUploadFile,
-                cancellationToken)
-            .ConfigureAwait(false);
+        try
+        {
+            var reference = await AddUploadedFileReferenceAsync(
+                    _requestContext.GetRequiredAccountId(),
+                    storedFile,
+                    preparedUploadFile,
+                    cancellationToken)
+                .ConfigureAwait(false);
 
-        return UploadFileResponse.Create(
-            reference.UploadId,
-            reference.BlobId,
-            reference.FileName,
-            reference.ObjectKey,
-            reference.Size);
+            return UploadFileResponse.Create(
+                reference.UploadId,
+                reference.BlobId,
+                reference.FileName,
+                reference.ObjectKey,
+                reference.Size,
+                reference.ExpiresAt);
+        }
+        catch
+        {
+            await RollbackStoredFileAsync(storedFile, cancellationToken).ConfigureAwait(false);
+            throw;
+        }
     }
 
     private async Task<PreparedUploadFile> PrepareAsync(
@@ -118,6 +127,8 @@ public sealed class UploadFileHandler : IUploadFileHandler
         PreparedUploadFile file,
         CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(file);
+
         var objectKey = BuildObjectKey(file.BlobId);
         var existingBlob = await _blobRepository
             .FindByIdAsync(file.BlobId, cancellationToken)
@@ -143,17 +154,25 @@ public sealed class UploadFileHandler : IUploadFileHandler
             .UploadFileAsync(compressedStream.Stream, objectKey, compressedStream.Length, cancellationToken)
             .ConfigureAwait(false);
 
-        await _blobRepository
-            .SetAsync(Blob.Create(file.BlobId, file.Size), cancellationToken)
-            .ConfigureAwait(false);
-
-        return new StoredFileResult
+        try
         {
-            BlobId = file.BlobId,
-            ObjectKey = objectKey,
-            BlobCreated = true,
-            ObjectUploaded = true
-        };
+            var blobCreated = await _blobRepository
+                .SetAsync(Blob.Create(file.BlobId, file.Size), cancellationToken)
+                .ConfigureAwait(false);
+
+            return new StoredFileResult
+            {
+                BlobId = file.BlobId,
+                ObjectKey = objectKey,
+                BlobCreated = blobCreated,
+                ObjectUploaded = blobCreated
+            };
+        }
+        catch
+        {
+            await SafeDeleteObjectAsync(objectKey, cancellationToken).ConfigureAwait(false);
+            throw;
+        }
     }
 
     private async Task<UploadedFileReference> AddUploadedFileReferenceAsync(
@@ -172,6 +191,54 @@ public sealed class UploadFileHandler : IUploadFileHandler
         await _uploadedFileRepository.SetAsync(reference, cancellationToken).ConfigureAwait(false);
 
         return reference;
+    }
+
+    private async Task RollbackStoredFileAsync(
+        StoredFileResult storedFile,
+        CancellationToken cancellationToken)
+    {
+        if (!storedFile.BlobCreated && !storedFile.ObjectUploaded)
+        {
+            return;
+        }
+
+        if (storedFile.BlobCreated)
+        {
+            await SafeRemoveBlobAsync(storedFile.BlobId, cancellationToken).ConfigureAwait(false);
+        }
+
+        if (storedFile.ObjectUploaded)
+        {
+            await SafeDeleteObjectAsync(storedFile.ObjectKey, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    private async Task SafeDeleteObjectAsync(
+        string objectKey,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _fileService.DeleteFileAsync(objectKey, cancellationToken).ConfigureAwait(false);
+        }
+        catch
+        {
+            // Best-effort cleanup should not hide the original failure.
+        }
+    }
+
+    private async Task SafeRemoveBlobAsync(
+        string blobId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _blobRepository.RemoveAsync(blobId, cancellationToken).ConfigureAwait(false);
+        }
+        catch
+        {
+            // Best-effort cleanup should not hide the original failure.
+        }
     }
 
     private static string BuildObjectKey(string blobId) => $"objects/{blobId}";

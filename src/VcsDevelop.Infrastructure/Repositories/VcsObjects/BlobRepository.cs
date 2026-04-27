@@ -24,14 +24,33 @@ public sealed class BlobRepository : BaseRepository, IBlobRepository
             .ConfigureAwait(false);
     }
 
-    public async Task SetAsync(Blob blob, CancellationToken cancellationToken = default)
+    public async Task<bool> SetAsync(Blob blob, CancellationToken cancellationToken = default)
     {
         if (_dbContext.ChangeTracker.Entries<Blob>().All(entry => entry.Entity.Id != blob.Id))
         {
             _dbContext.Blobs.Add(blob);
         }
 
-        await CommitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await CommitAsync(cancellationToken).ConfigureAwait(false);
+            return true;
+        }
+        catch (DbUpdateException)
+        {
+            var existingBlob = await _dbContext.Blobs
+                .AsNoTracking()
+                .SingleOrDefaultAsync(item => item.Id == blob.Id, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (existingBlob is null)
+            {
+                throw;
+            }
+
+            _dbContext.ChangeTracker.Clear();
+            return false;
+        }
     }
 
     public async Task RemoveAsync(string id, CancellationToken cancellationToken = default)

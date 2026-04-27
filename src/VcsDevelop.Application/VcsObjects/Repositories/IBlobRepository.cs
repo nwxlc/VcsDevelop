@@ -6,7 +6,7 @@ public interface IBlobRepository
 {
     Task<Blob?> FindByIdAsync(string id, CancellationToken cancellationToken = default);
 
-    Task SetAsync(Blob blob, CancellationToken cancellationToken = default);
+    Task<bool> SetAsync(Blob blob, CancellationToken cancellationToken = default);
 
     Task RemoveAsync(string id, CancellationToken cancellationToken = default);
 }

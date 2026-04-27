@@ -38,17 +38,6 @@ public sealed class MinioFileService : IFileService
             throw new InvalidOperationException("MinIO bucket name is not configured.");
         }
 
-        var bucketExists = await _minioClient
-            .BucketExistsAsync(new BucketExistsArgs().WithBucket(targetBucketName), cancellationToken)
-            .ConfigureAwait(false);
-
-        if (!bucketExists)
-        {
-            await _minioClient
-                .MakeBucketAsync(new MakeBucketArgs().WithBucket(targetBucketName), cancellationToken)
-                .ConfigureAwait(false);
-        }
-
         if (stream.CanSeek)
         {
             stream.Position = 0;

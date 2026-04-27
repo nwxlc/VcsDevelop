@@ -1,4 +1,4 @@
-namespace VcsDevelop.Application.VcsObjects.Models;
+namespace VcsDevelop.Application.VcsObjects.Files.Models;
 
 public sealed class UploadedFileReference
 {
@@ -9,6 +9,8 @@ public sealed class UploadedFileReference
     public string ObjectKey { get; init; }
     public long Size { get; init; }
     public DateTime CreatedAt { get; init; }
+    public DateTime ExpiresAt { get; init; }
+    public static TimeSpan DefaultLifetime => TimeSpan.FromHours(24);
 
     private UploadedFileReference(
         Guid uploadId,
@@ -17,7 +19,8 @@ public sealed class UploadedFileReference
         string fileName,
         string objectKey,
         long size,
-        DateTime createdAt)
+        DateTime createdAt,
+        DateTime expiresAt)
     {
         UploadId = uploadId;
         AccountId = accountId;
@@ -26,6 +29,7 @@ public sealed class UploadedFileReference
         ObjectKey = objectKey;
         Size = size;
         CreatedAt = createdAt;
+        ExpiresAt = expiresAt;
     }
 
     public static UploadedFileReference Create(
@@ -35,6 +39,13 @@ public sealed class UploadedFileReference
         string objectKey,
         long size)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(blobId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(objectKey);
+        ArgumentOutOfRangeException.ThrowIfNegative(size);
+
+        var createdAt = DateTime.UtcNow;
+
         return new UploadedFileReference(
             Guid.NewGuid(),
             accountId,
@@ -42,6 +53,7 @@ public sealed class UploadedFileReference
             fileName,
             objectKey,
             size,
-            DateTime.UtcNow);
+            createdAt,
+            createdAt.Add(DefaultLifetime));
     }
 }

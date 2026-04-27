@@ -1,6 +1,6 @@
 using System.Text.Json;
 using StackExchange.Redis;
-using VcsDevelop.Application.VcsObjects.Models;
+using VcsDevelop.Application.VcsObjects.Files.Models;
 using VcsDevelop.Application.VcsObjects.Repositories;
 
 namespace VcsDevelop.Infrastructure.Repositories.VcsObjects;
@@ -36,11 +36,17 @@ public sealed class RedisUploadedFileRepository : IUploadedFileRepository
         ArgumentNullException.ThrowIfNull(reference);
         cancellationToken.ThrowIfCancellationRequested();
 
+        var expiration = reference.ExpiresAt - DateTime.UtcNow;
+        if (expiration <= TimeSpan.Zero)
+        {
+            expiration = TimeSpan.FromMinutes(1);
+        }
+
         var payload = JsonSerializer.Serialize(reference, JsonSerializerOptions);
         await _database.StringSetAsync(
                 BuildKey(reference.UploadId),
                 payload,
-                expiry: TimeSpan.FromHours(24))
+                expiry: expiration)
             .ConfigureAwait(false);
     }
 

@@ -1,4 +1,4 @@
-namespace VcsDevelop.Application.VcsObjects.Models;
+namespace VcsDevelop.Application.VcsObjects.Files.Models;
 
 public sealed class StoredFileResult
 {

@@ -1,4 +1,4 @@
-namespace VcsDevelop.Application.VcsObjects.Models;
+namespace VcsDevelop.Application.VcsObjects.Files.Models;
 
 public sealed class PreparedUploadFile : IAsyncDisposable
 {
@@ -21,6 +21,11 @@ public sealed class PreparedUploadFile : IAsyncDisposable
 
     public static PreparedUploadFile Create(string blobId, string fileName, string tempFilePath, long size)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(blobId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(tempFilePath);
+        ArgumentOutOfRangeException.ThrowIfNegative(size);
+
         return new PreparedUploadFile(blobId, fileName, tempFilePath, size);
     }
 
