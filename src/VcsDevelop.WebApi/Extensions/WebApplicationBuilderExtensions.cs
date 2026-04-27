@@ -30,6 +30,8 @@ public static class WebApplicationBuilderExtensions
 
         service.AddRepository();
 
+        service.AddFileServices();
+
         service.AddHandlers();
 
         service.AddProblemDetails(ProblemDetailsExtensions.Configure);

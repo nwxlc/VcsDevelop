@@ -6,7 +6,7 @@ public class Blob
     public long Size { get; private init; }
     public DateTime CreatedAt { get; private init; }
 
-    public Blob(
+    private Blob(
         string id,
         long size,
         DateTime createdAt)
@@ -14,5 +14,10 @@ public class Blob
         Id = id;
         Size = size;
         CreatedAt = createdAt;
+    }
+
+    public static Blob Create(string id, long size)
+    {
+        return new Blob(id, size, DateTime.UtcNow);
     }
 }

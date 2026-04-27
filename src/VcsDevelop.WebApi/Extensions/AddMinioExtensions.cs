@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Options;
 using Minio;
-using VcsDevelop.Application.VcsObjects.Services;
 using VcsDevelop.Infrastructure.Options.Minio;
 using VcsDevelop.Infrastructure.Services;
 
@@ -31,13 +30,8 @@ public static class AddMinioExtensions
                 .Build();
         });
 
-        services.AddScoped<IFileService, MinioFileService>();
+        services.AddSingleton<MinioBucketInitializer>();
 
         return services;
-    }
-
-    private static void ValidateOptions(MinioOptions options)
-    {
-        ArgumentNullException.ThrowIfNull(options);
     }
 }

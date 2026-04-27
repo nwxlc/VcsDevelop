@@ -14,6 +14,7 @@ builder
 
 var app = builder.Build();
 
+await app.EnsureMinioBucketExistsAsync();
 await app.ApplyMigrationsAsync();
 
 app.ConfigureMiddleware();
