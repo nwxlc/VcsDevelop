@@ -49,7 +49,7 @@ public sealed class UploadFileHandler : IUploadFileHandler
         ArgumentException.ThrowIfNullOrWhiteSpace(request.FileName);
 
         //todo добавить логику "транзакции", т.е. откатывать все если не прошло 
-        var preparedUploadFile = await PrepareAsync(
+        await using var preparedUploadFile = await PrepareAsync(
                 request.Stream,
                 request.FileName,
                 cancellationToken)
