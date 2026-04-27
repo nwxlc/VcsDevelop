@@ -48,7 +48,6 @@ public sealed class UploadFileHandler : IUploadFileHandler
         ArgumentNullException.ThrowIfNull(request.Stream);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.FileName);
 
-        // Temporary file is cleaned up via PreparedUploadFile.DisposeAsync.
         await using var preparedUploadFile = await PrepareAsync(
                 request.Stream,
                 request.FileName,
@@ -197,7 +196,7 @@ public sealed class UploadFileHandler : IUploadFileHandler
         StoredFileResult storedFile,
         CancellationToken cancellationToken)
     {
-        if (!storedFile.BlobCreated && !storedFile.ObjectUploaded)
+        if (storedFile is { BlobCreated: false, ObjectUploaded: false })
         {
             return;
         }
@@ -223,7 +222,7 @@ public sealed class UploadFileHandler : IUploadFileHandler
         }
         catch
         {
-            // Best-effort cleanup should not hide the original failure.
+            // ignored
         }
     }
 
@@ -237,7 +236,7 @@ public sealed class UploadFileHandler : IUploadFileHandler
         }
         catch
         {
-            // Best-effort cleanup should not hide the original failure.
+            // ignored
         }
     }
 
