@@ -4,6 +4,8 @@ using VcsDevelop.Application.Accounts.QueryHandlers;
 using VcsDevelop.Application.VcsObjects.Documents.Abstractions;
 using VcsDevelop.Application.VcsObjects.Documents.CommandHandlers;
 using VcsDevelop.Application.VcsObjects.Documents.QueryHandlers;
+using VcsDevelop.Application.VcsObjects.Files.Abstractions;
+using VcsDevelop.Application.VcsObjects.Files.CommandHandlers;
 
 namespace VcsDevelop.WebApi.Extensions;
 
