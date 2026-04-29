@@ -16,6 +16,7 @@ public sealed class UploadFileHandler : IUploadFileHandler
     private readonly IUploadedFileRepository _uploadedFileRepository;
     private readonly ICompressionService _compressionService;
     private readonly IHashService _hashService;
+    private readonly IDocumentRepository _documentRepository;
 
     public UploadFileHandler(
         IBlobRepository blobRepository,
@@ -23,7 +24,8 @@ public sealed class UploadFileHandler : IUploadFileHandler
         IRequestContext requestContext,
         IUploadedFileRepository uploadedFileRepository,
         ICompressionService compressionService,
-        IHashService hashService)
+        IHashService hashService,
+        IDocumentRepository documentRepository)
     {
         ArgumentNullException.ThrowIfNull(blobRepository);
         ArgumentNullException.ThrowIfNull(fileService);
@@ -31,6 +33,7 @@ public sealed class UploadFileHandler : IUploadFileHandler
         ArgumentNullException.ThrowIfNull(uploadedFileRepository);
         ArgumentNullException.ThrowIfNull(compressionService);
         ArgumentNullException.ThrowIfNull(hashService);
+        ArgumentNullException.ThrowIfNull(documentRepository);
 
         _blobRepository = blobRepository;
         _fileService = fileService;
@@ -38,6 +41,7 @@ public sealed class UploadFileHandler : IUploadFileHandler
         _uploadedFileRepository = uploadedFileRepository;
         _compressionService = compressionService;
         _hashService = hashService;
+        _documentRepository = documentRepository;
     }
 
     public async Task<UploadFileResponse> HandleAsync(
@@ -55,6 +59,8 @@ public sealed class UploadFileHandler : IUploadFileHandler
             .ConfigureAwait(false);
 
         var storedFile = await StorageFileAsync(
+                _requestContext.GetRequiredAccountId(),
+                request.DocumentId,
                 preparedUploadFile,
                 cancellationToken)
             .ConfigureAwait(false);
@@ -123,12 +129,18 @@ public sealed class UploadFileHandler : IUploadFileHandler
     }
 
     private async Task<StoredFileResult> StorageFileAsync(
+        Guid accountId,
+        Guid documentId,
         PreparedUploadFile file,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(file);
 
-        var objectKey = BuildObjectKey(file.BlobId);
+        var document = await _documentRepository
+            .GetByIdAsync(documentId, cancellationToken)
+            .ConfigureAwait(false);
+
+        var objectKey = BuildObjectKey(accountId, document.Name, file.BlobId);
         var existingBlob = await _blobRepository
             .FindByIdAsync(file.BlobId, cancellationToken)
             .ConfigureAwait(false);
@@ -240,5 +252,6 @@ public sealed class UploadFileHandler : IUploadFileHandler
         }
     }
 
-    private static string BuildObjectKey(string blobId) => $"objects/{blobId}";
+    private static string BuildObjectKey(Guid accountId, string documentName, string blobId)
+        => $"{accountId}/{documentName}/{blobId}";
 }

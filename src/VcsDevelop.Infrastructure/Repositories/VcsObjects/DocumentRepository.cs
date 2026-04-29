@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using VcsDevelop.Application.VcsObjects.Repositories;
+using VcsDevelop.Domain.VcsObjects.Errors;
 using VcsDevelop.Infrastructure.DbContexts;
 using Document = VcsDevelop.Domain.VcsObjects.Document;
 
@@ -24,6 +25,21 @@ public class DocumentRepository : BaseRepository, IDocumentRepository
                 document => document.Name == name && document.OwnerId == ownerId,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    public async Task<Document> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var document = await _dbContext.Documents
+            .SingleOrDefaultAsync(document => document.Id == id,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        if (document is null)
+        {
+            throw new DocumentNotFound(document!.Id);
+        }
+
+        return document;
     }
 
     public async Task<Document?> FindByIdAsync(
