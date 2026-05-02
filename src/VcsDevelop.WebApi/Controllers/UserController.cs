@@ -118,4 +118,19 @@ public class UserController : ControllerBase
             return NotFound();
         }
     }
+
+    [HttpPost("refresh_access_token")]
+    public async Task<ActionResult<AccountResponse>> RefreshAccessTokenAsync(
+        [FromBody]RefreshAccessTokenRequest request,
+        [FromServices]IRefreshAccessTokenCommandHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var command = RefreshAccessTokenCommand.Create(request.RefreshToken);
+        var accountResponse = await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
+
+        return Ok(accountResponse);
+    }
 }
