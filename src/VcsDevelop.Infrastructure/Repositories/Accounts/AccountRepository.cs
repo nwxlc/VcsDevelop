@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using VcsDevelop.Application.Accounts.Repositories;
 using VcsDevelop.Domain.Accounts;
+using VcsDevelop.Domain.Accounts.Errors;
 using VcsDevelop.Infrastructure.DbContexts;
 
 namespace VcsDevelop.Infrastructure.Repositories.Accounts;
@@ -31,6 +32,18 @@ public sealed class AccountRepository : BaseRepository, IAccountRepository
             .ConfigureAwait(false);
     }
 
+    public async Task<Account> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var account = await FindByIdAsync(id, cancellationToken).ConfigureAwait(false);
+
+        if (account is null)
+        {
+            throw AccountNotFound.ById(id);
+        }
+
+        return account;
+    }
+
     public async Task<Account> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(email);
@@ -41,7 +54,12 @@ public sealed class AccountRepository : BaseRepository, IAccountRepository
                 cancellationToken)
             .ConfigureAwait(false);
 
-        return account ?? throw new ArgumentException("Either accountId or email must be provided");
+        if (account is null)
+        {
+            throw AccountNotFound.ByEmail(email);
+        }
+
+        return account;
     }
 
     public async Task SetAsync(Account account, CancellationToken cancellationToken = default)
