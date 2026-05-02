@@ -42,6 +42,17 @@ internal static class ProblemDetailsExtensions
             return problem;
         });
 
+        options.Map<UnauthorizedAccessException>(ex =>
+        {
+            return new ProblemDetails
+            {
+                Type = "about:blank",
+                Title = "Unauthorized",
+                Status = StatusCodes.Status401Unauthorized,
+                Detail = ex.Message
+            };
+        });
+
         options.Map<Exception>(ex =>
         {
             return new ProblemDetails
@@ -57,6 +68,7 @@ internal static class ProblemDetailsExtensions
     private static int MapStatus(Error error) => error switch
     {
         Conflict => StatusCodes.Status409Conflict,
+        NotFound => StatusCodes.Status404NotFound,
         _ => StatusCodes.Status500InternalServerError
     };
 
