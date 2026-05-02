@@ -12,7 +12,7 @@ public sealed class UploadedFileReference
     public DateTime ExpiresAt { get; init; }
     public static TimeSpan DefaultLifetime => TimeSpan.FromHours(24);
 
-    private UploadedFileReference(
+    public UploadedFileReference(
         Guid uploadId,
         Guid accountId,
         string blobId,
