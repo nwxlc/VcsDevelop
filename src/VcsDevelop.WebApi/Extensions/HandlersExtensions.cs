@@ -21,6 +21,7 @@ public static class HandlersExtensions
         services.AddScoped<ILogoutCommandHandler, LogoutCommandHandler>();
         services.AddScoped<IGetAccountByIdHandler, GetAccountByIdHandler>();
         services.AddScoped<IUpdateAccountHandler, UpdateAccountHandler>();
+        services.AddScoped<IRefreshAccessTokenCommandHandler, RefreshAccessTokenCommandHandler>();
 
         services.AddScoped<ICreateDocumentHandler, CreateDocumentHandler>();
         services.AddScoped<IGetDocumentByIdHandler, GetDocumentByIdHandler>();

@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using VcsDevelop.Application.Accounts.Auth;
+using VcsDevelop.Core.Errors;
 using VcsDevelop.Domain.Accounts;
 using VcsDevelop.Infrastructure.Options.Tokens;
 
@@ -33,6 +34,29 @@ public sealed class RefreshTokenProvider : IRefreshTokenProvider
             .ConfigureAwait(false);
 
         return token;
+    }
+
+    public async Task<Guid> ValidateAndRevokeRefreshTokenAsync(string refreshTokenValue,
+        CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(refreshTokenValue);
+
+        var tokenData = await _refreshTokenRepository.GetAsync(refreshTokenValue, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (tokenData is null)
+        {
+            throw new Conflict();
+        }
+
+        await _refreshTokenRepository.RemoveAsync(tokenData, cancellationToken).ConfigureAwait(false);
+
+        if (tokenData.IsExpired())
+        {
+            throw new Conflict();
+        }
+
+        return tokenData.UserId;
     }
 
     public async Task RevokeRefreshTokenAsync(string tokenValue, CancellationToken cancellationToken)

@@ -10,7 +10,7 @@ public sealed class RefreshToken
     public Guid UserId { get; private init; }
     public DateTimeOffset ExpiresAt { get; private init; }
 
-    private RefreshToken(
+    public RefreshToken(
         Guid userId,
         string tokenHash,
         DateTimeOffset expiresAt)
@@ -19,7 +19,7 @@ public sealed class RefreshToken
         TokenHash = tokenHash;
         ExpiresAt = expiresAt;
     }
-    
+
     public static RefreshToken Create(
         Token token,
         Guid userId)
@@ -41,4 +41,6 @@ public sealed class RefreshToken
         var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(token));
         return Convert.ToHexString(bytes);
     }
+
+    public bool IsExpired() => DateTimeOffset.UtcNow >= ExpiresAt;
 }
