@@ -14,5 +14,9 @@ public interface IDocumentRepository
         Guid ownerId,
         CancellationToken cancellationToken);
 
+    Task<Document> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default);
+
     Task SetAsync(Document document, CancellationToken cancellationToken = default);
 }
