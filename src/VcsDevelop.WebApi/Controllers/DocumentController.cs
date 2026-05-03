@@ -36,13 +36,12 @@ public class DocumentController : ControllerBase
         var documentId = await handler.HandleAsync(command, cancellationToken)
             .ConfigureAwait(false);
 
-        return CreatedAtAction(
+        return CreatedAtRoute(
             "GetDocumentById",
             new { id = documentId },
             new { id = documentId });
     }
 
-    [HttpGet("{id:guid}", Name = "GetById")]
     [HttpGet("{id:guid}", Name = "GetDocumentById")]
     public async Task<ActionResult<DocumentResponse>> GetByIdAsync(
         Guid id,
@@ -93,6 +92,26 @@ public class DocumentController : ControllerBase
         await using var stream = request.File.OpenReadStream();
 
         var command = UploadFileCommand.Create(id, stream, normalizedFileName);
+        var response = await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
+
+        return Ok(response);
+    }
+
+    [HttpPost("{id:guid}/stage")]
+    public async Task<ActionResult<StageDocumentFileResponse>> StageFileAsync(
+        Guid id,
+        [FromBody]StageDocumentFileRequest request,
+        [FromServices]IStageDocumentFileHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var command = StageDocumentFileCommand.Create(
+            id,
+            request.UploadId,
+            request.RepositoryPath ?? string.Empty);
+
         var response = await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 
         return Ok(response);
