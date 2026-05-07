@@ -12,10 +12,10 @@ public sealed class ConfigureJwtBearerOptions
     public ConfigureJwtBearerOptions(ITokenValidationParametersFactory factory)
     {
         ArgumentNullException.ThrowIfNull(factory);
-        
+
         _factory = factory;
     }
-    
+
     public void Configure(string? name, JwtBearerOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
