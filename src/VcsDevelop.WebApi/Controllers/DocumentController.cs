@@ -20,8 +20,8 @@ public class DocumentController : ControllerBase
 
     [HttpPost("create")]
     public async Task<IActionResult> CreateDocumentAsync(
-        [FromBody]CreateDocumentRequest request,
-        [FromServices]ICreateDocumentHandler handler,
+        [FromBody] CreateDocumentRequest request,
+        [FromServices] ICreateDocumentHandler handler,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -45,7 +45,7 @@ public class DocumentController : ControllerBase
     [HttpGet("{id:guid}", Name = "GetDocumentById")]
     public async Task<ActionResult<DocumentResponse>> GetByIdAsync(
         Guid id,
-        [FromServices]IGetDocumentByIdHandler handler,
+        [FromServices] IGetDocumentByIdHandler handler,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(handler);
@@ -70,8 +70,8 @@ public class DocumentController : ControllerBase
     [RequestSizeLimit(52428800)]
     public async Task<ActionResult<UploadFileResponse>> UploadFileAsync(
         Guid id,
-        [FromForm]UploadFileRequest request,
-        [FromServices]IUploadFileHandler handler,
+        [FromForm] UploadFileRequest request,
+        [FromServices] IUploadFileHandler handler,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -100,8 +100,8 @@ public class DocumentController : ControllerBase
     [HttpPost("{id:guid}/stage")]
     public async Task<ActionResult<StageDocumentFileResponse>> StageFileAsync(
         Guid id,
-        [FromBody]StageDocumentFileRequest request,
-        [FromServices]IStageDocumentFileHandler handler,
+        [FromBody] StageDocumentFileRequest request,
+        [FromServices] IStageDocumentFileHandler handler,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
