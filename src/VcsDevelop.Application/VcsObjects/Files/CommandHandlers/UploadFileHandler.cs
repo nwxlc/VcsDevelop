@@ -4,6 +4,7 @@ using VcsDevelop.Application.VcsObjects.Files.Models;
 using VcsDevelop.Application.VcsObjects.Repositories;
 using VcsDevelop.Application.VcsObjects.Services;
 using VcsDevelop.Core.Application;
+using VcsDevelop.Core.Errors;
 using Blob = VcsDevelop.Domain.VcsObjects.Blob;
 
 namespace VcsDevelop.Application.VcsObjects.Files.CommandHandlers;
@@ -52,6 +53,17 @@ public sealed class UploadFileHandler : IUploadFileHandler
         ArgumentNullException.ThrowIfNull(request.Stream);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.FileName);
 
+        var accountId = _requestContext.GetRequiredAccountId();
+
+        var document = await _documentRepository
+            .FindByIdAsync(request.DocumentId, accountId, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (document is null)
+        {
+            throw new NotFound().WithDetails($"Document with {request.DocumentId} not found.");
+        }
+
         await using var preparedUploadFile = await PrepareAsync(
                 request.Stream,
                 request.FileName,
@@ -59,8 +71,6 @@ public sealed class UploadFileHandler : IUploadFileHandler
             .ConfigureAwait(false);
 
         var storedFile = await StorageFileAsync(
-                _requestContext.GetRequiredAccountId(),
-                request.DocumentId,
                 preparedUploadFile,
                 cancellationToken)
             .ConfigureAwait(false);
@@ -68,7 +78,7 @@ public sealed class UploadFileHandler : IUploadFileHandler
         try
         {
             var reference = await AddUploadedFileReferenceAsync(
-                    _requestContext.GetRequiredAccountId(),
+                    accountId,
                     storedFile,
                     preparedUploadFile,
                     cancellationToken)
@@ -129,18 +139,12 @@ public sealed class UploadFileHandler : IUploadFileHandler
     }
 
     private async Task<StoredFileResult> StorageFileAsync(
-        Guid accountId,
-        Guid documentId,
         PreparedUploadFile file,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(file);
 
-        var document = await _documentRepository
-            .GetByIdAsync(documentId, cancellationToken)
-            .ConfigureAwait(false);
-
-        var objectKey = BuildObjectKey(accountId, document.Name, file.BlobId);
+        var objectKey = BuildObjectKey(file.BlobId);
         var existingBlob = await _blobRepository
             .FindByIdAsync(file.BlobId, cancellationToken)
             .ConfigureAwait(false);
@@ -252,6 +256,6 @@ public sealed class UploadFileHandler : IUploadFileHandler
         }
     }
 
-    private static string BuildObjectKey(Guid accountId, string documentName, string blobId)
-        => $"{accountId}/{documentName}/{blobId}";
+    private static string BuildObjectKey(string blobId)
+        => $"objects/{blobId}";
 }

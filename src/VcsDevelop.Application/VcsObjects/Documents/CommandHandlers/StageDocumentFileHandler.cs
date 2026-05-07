@@ -38,22 +38,27 @@ public sealed class StageDocumentFileHandler : IStageDocumentFileHandler
         ArgumentNullException.ThrowIfNull(request);
 
         var accountId = _requestContext.GetRequiredAccountId();
-        
+
         var document = await _documentRepository
-            .GetByIdAsync(request.DocumentId, cancellationToken)
+            .FindByIdAsync(request.DocumentId, accountId, cancellationToken)
             .ConfigureAwait(false);
-        
+
+        if (document is null)
+        {
+            throw new NotFound().WithDetails($"Document '{request.DocumentId}' was not found.");
+        }
+
         var upload = await _uploadedFileRepository
             .FindByIdAsync(request.UploadId, cancellationToken)
             .ConfigureAwait(false);
-        
+
         if (upload is null || upload.AccountId != accountId)
         {
             throw new NotFound().WithDetails($"Uploaded file '{request.UploadId}' was not found.");
         }
 
         var stagedAt = DateTime.UtcNow;
-        var repositoryPath = NormalizeRepositoryPath(request.RepositoryPath);
+        var repositoryPath = RepositoryPath.Create(request.RepositoryPath, upload.FileName);
 
         var stagedEntry = new StagedFileEntry
         {
@@ -62,11 +67,11 @@ public sealed class StageDocumentFileHandler : IStageDocumentFileHandler
             UploadId = upload.UploadId,
             BlobId = upload.BlobId,
             FileName = upload.FileName,
-            RepositoryPath = repositoryPath,
+            RepositoryPath = repositoryPath.Value,
             ObjectKey = upload.ObjectKey,
             StagedAt = stagedAt
         };
-        
+
         await _stagingAreaRepository.AddOrReplaceAsync(stagedEntry, cancellationToken).ConfigureAwait(false);
 
         return new StageDocumentFileResponse
@@ -74,20 +79,8 @@ public sealed class StageDocumentFileHandler : IStageDocumentFileHandler
             DocumentId = document.Id,
             UploadId = upload.UploadId,
             BlobId = upload.BlobId,
-            RepositoryPath = repositoryPath,
+            RepositoryPath = repositoryPath.Value,
             StagedAt = stagedAt
         };
-    }
-
-    private static string NormalizeRepositoryPath(string? repositoryPath)
-    {
-        if (string.IsNullOrWhiteSpace(repositoryPath))
-        {
-            return string.Empty;
-        }
-
-        return repositoryPath
-            .Replace('\\', '/')
-            .TrimStart('/');
     }
 }
