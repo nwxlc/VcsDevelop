@@ -13,7 +13,10 @@ public sealed class Commit
     // EF only
     private Commit()
     {
+        Id = null!;
+        RootTreeId = null!;
         ParentIds = new HashSet<CommitParent>();
+        Message = null!;
     }
 
     public Commit(

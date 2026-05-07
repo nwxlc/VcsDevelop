@@ -7,6 +7,7 @@ public sealed class CommitParent
     // EF only
     private CommitParent()
     {
+        ParentId = null!;
     }
 
     public CommitParent(string parentId)
