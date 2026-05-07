@@ -14,6 +14,8 @@ public sealed class Account
     // EF only
     private Account()
     {
+        Name = null!;
+        Email = null!;
         Password = null!;
     }
 

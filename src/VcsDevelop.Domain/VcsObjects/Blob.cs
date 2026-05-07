@@ -18,6 +18,9 @@ public class Blob
 
     public static Blob Create(string id, long size)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(id);
+        ArgumentOutOfRangeException.ThrowIfNegative(size);
+
         return new Blob(id, size, DateTime.UtcNow);
     }
 }

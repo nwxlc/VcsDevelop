@@ -26,6 +26,7 @@ public static class HandlersExtensions
         services.AddScoped<ICreateDocumentHandler, CreateDocumentHandler>();
         services.AddScoped<IGetDocumentByIdHandler, GetDocumentByIdHandler>();
         services.AddScoped<IUploadFileHandler, UploadFileHandler>();
+        services.AddScoped<IStageDocumentFileHandler, StageDocumentFileHandler>();
 
         return services;
     }

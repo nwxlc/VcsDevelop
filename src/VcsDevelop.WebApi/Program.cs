@@ -19,8 +19,8 @@ await app.ApplyMigrationsAsync();
 
 app.ConfigureMiddleware();
 
-app.UseDefaultFiles(); 
-app.UseStaticFiles(); 
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseRouting();
 

@@ -32,7 +32,7 @@ public static class OpenApiExtensions
                 return Task.CompletedTask;
             });
         });
-        
+
         return services;
     }
 }

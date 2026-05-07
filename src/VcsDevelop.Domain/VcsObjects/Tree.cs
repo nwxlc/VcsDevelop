@@ -8,6 +8,7 @@ public sealed class Tree
     // EF only
     private Tree()
     {
+        Id = null!;
         Entries = new HashSet<TreeEntry>();
     }
 
