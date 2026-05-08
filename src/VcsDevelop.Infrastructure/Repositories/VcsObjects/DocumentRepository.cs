@@ -30,7 +30,8 @@ public class DocumentRepository : BaseRepository, IDocumentRepository
     public async Task<Document> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var document = await _dbContext.Documents
-            .SingleOrDefaultAsync(document => document.Id == id,
+            .SingleOrDefaultAsync(
+                document => document.Id == id,
                 cancellationToken)
             .ConfigureAwait(false);
 

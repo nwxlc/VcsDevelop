@@ -12,6 +12,8 @@ public sealed class Document
     // EF only
     private Document()
     {
+        Name = null!;
+        DefaultBranchName = null!;
         Metadata = null!;
     }
 

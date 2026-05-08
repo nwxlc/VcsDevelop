@@ -33,6 +33,7 @@ public static class RepositoryExtension
 
         services.AddSingleton<IRefreshTokenRepository, RedisRefreshTokenRepository>();
         services.AddSingleton<IUploadedFileRepository, RedisUploadedFileRepository>();
+        services.AddSingleton<IStagingAreaRepository, RedisStagingAreaRepository>();
 
         return services;
     }

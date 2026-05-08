@@ -9,6 +9,7 @@ public sealed class DocumentMetadata
     // EF only
     private DocumentMetadata()
     {
+        Title = null!;
         Tags = new HashSet<DocumentTag>();
     }
 
