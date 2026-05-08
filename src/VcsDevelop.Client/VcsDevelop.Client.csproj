@@ -10,10 +10,14 @@
         <CopyBuildOutputToPublishDirectory>false</CopyBuildOutputToPublishDirectory>
         <NoBuild>true</NoBuild>
         <RootNamespace>VcsDevelop.Client</RootNamespace>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
         <Content Remove="node_modules\**" />
+        <Content Include="..\..\.dockerignore">
+          <Link>.dockerignore</Link>
+        </Content>
         <None Include="node_modules\**" Pack="false" />
     </ItemGroup>
 

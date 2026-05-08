@@ -11,11 +11,18 @@ public static class WebApplicationSpaExtensions
 
         app.UseWhen(
             ctx => !ctx.Request.Path.StartsWithSegments("/scalar")
-                   && !ctx.Request.Path.StartsWithSegments("/openapi"),
-            builder => builder.UseSpa(spa =>
+                   && !ctx.Request.Path.StartsWithSegments("/openapi")
+                   && !ctx.Request.Path.StartsWithSegments("/api"),
+            builder => 
             {
-                spa.UseProxyToSpaDevelopmentServer("http://localhost:5237");
-            })
+                builder.UseSpa(spa =>
+                {
+                    if (app.Environment.IsDevelopment())
+                    {
+                        spa.UseProxyToSpaDevelopmentServer("http://frontend:5173");
+                    }
+                });
+            }
         );
         
         return app;

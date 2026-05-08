@@ -14,7 +14,13 @@ const Header = () => {
                 </div>
                 <Link to="/"><h1>VCS-X</h1></Link>
             </div>
-            {location.pathname === "/login" ? (<></>) : (
+            {location.pathname === "/login" ? (
+                <></>
+            ) : localStorage.getItem("accessToken") ? (
+                <Link to="/workspace">
+                    <Button label={"Личный кабинет"} onClick={() => {}} />
+                </Link>
+            ) : (
                 <Link to="/login">
                     <Button label={"Авторизация"} onClick={() => {}} />
                 </Link>

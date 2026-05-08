@@ -9,9 +9,31 @@ const WorkspaceHeader = () => {
 
     const toggleMenu = () => setIsOpen(!isOpen);
 
-    const logout = () => {
-        setIsOpen(false);
-        navigate("/");
+    const logout = async ()  => {
+        
+        const token = localStorage.getItem('accessToken')
+        const refreshToken = localStorage.getItem('refreshToken')
+        console.log(refreshToken)
+        try {
+            const response = await fetch('http://localhost:5050/api/account/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    refreshToken: refreshToken,
+                })
+            })
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+            localStorage.removeItem("accountId");
+            setIsOpen(false);
+            navigate("/");
+        } catch (error) {
+            console.log(error);
+        } 
+        
     };
 
     return (

@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Options;
 using Minio;
-using VcsDevelop.Application.VcsObjects.Services;
+//using VcsDevelop.Application.VcsObjects.Services;
 using VcsDevelop.Infrastructure.Options.Minio;
-using VcsDevelop.Infrastructure.Services;
+//using VcsDevelop.Infrastructure.Services;
 
 namespace VcsDevelop.WebApi.Extensions;
 
@@ -31,7 +31,7 @@ public static class AddMinioExtensions
                 .Build();
         });
 
-        services.AddScoped<IFileService, MinioFileService>();
+        //services.AddScoped<IFileService, MinioFileService>();
 
         return services;
     }

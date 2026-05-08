@@ -1,98 +1,174 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Button from "../GlobalComponents/Button.tsx";
-import {Link} from "react-router";
+import { useNavigate } from "react-router";
 
-const LoginBody = () => {
-    const [password, setPassword] = useState("");
-    const [email, setEmail] = useState("");
+const LoginBody: React.FC = () => {
+    const [isLoginMode, setIsLoginMode] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+    const [serverError, setServerError] = useState<string | null>(null);
 
-    const validateEmail = (email) => {
-        const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        return regex.test(email);
+    // Видимость паролей (раздельная)
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+
+    const [email, setEmail] = useState<string>("");
+    const [username, setUsername] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [confirmPassword, setConfirmPassword] = useState<string>("");
+
+    const navigate = useNavigate();
+
+    // Валидация
+    const validateEmail = (emailStr: string): boolean => {
+        return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(emailStr);
     };
 
-    const handleEmail = (e) => {
-        const val = e.target.value;
-        const cleanValue = val.replace(/[а-яё]/gi, "");
-        setEmail(cleanValue);
+    const getPasswordStrength = () => {
+        if (!password) return null;
+        const hasMinLength = password.length >= 8;
+        const hasNumbers = /\d/.test(password);
+        const hasUpper = /[A-Z]/.test(password);
+
+        if (!hasMinLength) return { label: "слишком короткий", className: "status-weak" };
+        if (hasUpper && hasNumbers) return { label: "безопасный", className: "status-safe" };
+        return { label: "нормальный", className: "status-normal" };
     };
 
-    const handlePassword = (e) => {
-        const val = e.target.value;
-        const cleanValue = val.replace(/[а-яё]/gi, "");
-        setPassword(cleanValue);
-    };
+    const cleanInput = (val: string) => val.replace(/[а-яё]/gi, "");
 
-    const getEmailData = (emailVal) => {
-        if (!emailVal) return null;
-        if (!validateEmail(emailVal)) {
-            return {label: "почта указана неверно", className: "status-weak"};
+    const handleSubmit = async () => {
+        setIsSubmitted(true);
+        setServerError(null);
 
+        if (!validateEmail(email)) return;
+
+        if (!isLoginMode) {
+            if (username.trim().length < 2) {
+                setServerError("Введите имя пользователя");
+                return;
+            }
+            if (password !== confirmPassword) {
+                return; 
+            }
+        }
+
+        setLoading(true);
+        const url = isLoginMode ? "/api/account/login" : "/api/account/registration";
+        const payload = isLoginMode ? { email, password } : { email, password, name: username };
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem("accessToken", data.accessToken.value);
+                localStorage.setItem("refreshToken", data.refreshToken.value);
+                localStorage.setItem("accountId", data.accountId);
+                navigate("/workspace");
+            } else if (response.status === 409) {
+                alert("Пользователь с такой почтой уже существует. Переключаемся на вход.");
+                setIsLoginMode(true);
+            } else {
+                const errorData = await response.json().catch(() => ({}));
+                setServerError(errorData.message || `Ошибка: ${response.status}`);
+            }
+        } catch (error) {
+            setServerError("Ошибка сети");
+        } finally {
+            setLoading(false);
         }
     };
-    
-    const handleSubmit = () => {
-        fetch("http://localhost:8080/login", {})
-    }
 
-    const getStrengthData = (pwd) => {
-        if (!pwd) return null;
-        const hasMinLength = pwd.length >= 8;
-        const hasLatin = /[a-zA-Z]/.test(pwd);
-        const hasNumbers = /\d/.test(pwd);
-        const hasUpper = /[A-Z]/.test(pwd);
-
-        if (!hasMinLength || !hasLatin) {
-            return {label: "слишком короткий", className: "status-weak"};
-        }
-        if (hasUpper && hasNumbers) {
-            return {label: "безопасный", className: "status-safe"};
-        }
-        if (hasNumbers) {
-            return {label: "нормальный", className: "status-normal"};
-        }
-        return {label: "слабый", className: "status-weak"};
-    };
-
-    const emailStatus = getEmailData(email);
-    const passwordStrength = getStrengthData(password);
+    const strength = getPasswordStrength();
 
     return (
         <div className="login">
+            {!isLoginMode && (
+                <input
+                    value={username}
+                    placeholder="имя пользователя"
+                    type="text"
+                    onChange={(e) => setUsername(cleanInput(e.target.value))}
+                />
+            )}
+
             <input
-                id="email"
                 value={email}
                 placeholder="почта"
                 type="email"
-                onChange={handleEmail}
+                onChange={(e) => { setEmail(cleanInput(e.target.value)); setIsSubmitted(false); }}
             />
-            {email.length > 7 && emailStatus && (
+
+            {(email.length > 7 || isSubmitted) && !validateEmail(email) && (
                 <span className="email-info">
-                    <span className={`status-text ${emailStatus.className}`}>
-                        {emailStatus.label}
-                    </span>
+                    <span className="status-text status-weak">почта указана неверно</span>
                 </span>
             )}
 
-            <input
-                id="password"
-                placeholder="пароль"
-                type="password"
-                value={password}
-                onChange={handlePassword}
-            />
-            {password && passwordStrength && (
+            {/* Основной пароль */}
+            <div className="password-wrapper" style={{ position: 'relative' }}>
+                <input
+                    placeholder="пароль"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(cleanInput(e.target.value))}
+                />
+                <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{ position: 'absolute', right: '10px', top: '33%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer' }}
+                >
+                    {showPassword ? "🙈" : "👁️"}
+                </button>
+            </div>
+
+            {!isLoginMode && (
+                <div className="password-wrapper" style={{ position: 'relative' }}>
+                    <input
+                        placeholder="повторите пароль"
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(cleanInput(e.target.value))}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        style={{ position: 'absolute', right: '10px', top: '33%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer' }}
+                    >
+                        {showConfirmPassword ? "🙈" : "👁️"}
+                    </button>
+                </div>
+            )}
+
+            {!isLoginMode && password && strength && (
                 <span className="password-info">
-                    надёжность пароля:{" "}
-                    <span className={`status-text ${passwordStrength.className}`}>
-                        {passwordStrength.label}
-                    </span>
+                    надёжность: <span className={`status-text ${strength.className}`}>{strength.label}</span>
                 </span>
             )}
 
-            <Link to="/workspace">
-                <Button label="войти" onClick={() => {}}/>
-            </Link>
+            {!isLoginMode && isSubmitted && password !== confirmPassword && (
+                <span className="status-text status-weak">пароли не совпадают</span>
+            )}
+
+            {serverError && <span className="status-text status-weak">Логин или пароль введены неверно</span>}
+
+            <Button
+                label={loading ? "загрузка..." : (isLoginMode ? "Войти" : "Зарегистрироваться")}
+                onClick={handleSubmit}
+            />
+
+            <div className="login-activate" style={{ cursor: 'pointer', marginTop: '15px' }}>
+                {isLoginMode ? (
+                    <span onClick={() => setIsLoginMode(false)}>Нет аккаунта? <b>Зарегистрироваться</b></span>
+                ) : (
+                    <span onClick={() => setIsLoginMode(true)}>уже есть аккаунт? <b>войти</b></span>
+                )}
+            </div>
         </div>
     );
 };
