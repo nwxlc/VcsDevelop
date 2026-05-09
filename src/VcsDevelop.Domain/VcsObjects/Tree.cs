@@ -19,4 +19,9 @@ public sealed class Tree
         Id = id;
         Entries = entries;
     }
+
+    public static Tree Create(string id, IReadOnlyCollection<TreeEntry> entries)
+    {
+        return new Tree(id, entries);
+    }
 }
