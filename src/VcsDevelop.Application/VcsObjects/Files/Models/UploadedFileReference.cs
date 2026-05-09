@@ -3,6 +3,7 @@ namespace VcsDevelop.Application.VcsObjects.Files.Models;
 public sealed class UploadedFileReference
 {
     public Guid UploadId { get; init; }
+    public Guid DocumentId { get; init; }
     public Guid AccountId { get; init; }
     public string BlobId { get; init; }
     public string FileName { get; init; }
@@ -14,6 +15,7 @@ public sealed class UploadedFileReference
 
     public UploadedFileReference(
         Guid uploadId,
+        Guid documentId,
         Guid accountId,
         string blobId,
         string fileName,
@@ -23,6 +25,7 @@ public sealed class UploadedFileReference
         DateTime expiresAt)
     {
         UploadId = uploadId;
+        DocumentId = documentId;
         AccountId = accountId;
         BlobId = blobId;
         FileName = fileName;
@@ -33,6 +36,7 @@ public sealed class UploadedFileReference
     }
 
     public static UploadedFileReference Create(
+        Guid documentId,
         Guid accountId,
         string blobId,
         string fileName,
@@ -49,6 +53,7 @@ public sealed class UploadedFileReference
         return new UploadedFileReference(
             Guid.NewGuid(),
             accountId,
+            documentId,
             blobId,
             fileName,
             objectKey,
