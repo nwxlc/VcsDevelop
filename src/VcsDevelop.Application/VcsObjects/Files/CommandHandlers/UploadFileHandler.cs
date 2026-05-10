@@ -78,6 +78,7 @@ public sealed class UploadFileHandler : IUploadFileHandler
         try
         {
             var reference = await AddUploadedFileReferenceAsync(
+                    document.Id,
                     accountId,
                     storedFile,
                     preparedUploadFile,
@@ -94,7 +95,7 @@ public sealed class UploadFileHandler : IUploadFileHandler
         }
         catch
         {
-            await RollbackStoredFileAsync(storedFile, cancellationToken).ConfigureAwait(false);
+            await RollbackStoredFileAsync(storedFile, CancellationToken.None).ConfigureAwait(false);
             throw;
         }
     }
@@ -185,18 +186,20 @@ public sealed class UploadFileHandler : IUploadFileHandler
         }
         catch
         {
-            await SafeDeleteObjectAsync(objectKey, cancellationToken).ConfigureAwait(false);
+            await SafeDeleteObjectAsync(objectKey, CancellationToken.None).ConfigureAwait(false);
             throw;
         }
     }
 
     private async Task<UploadedFileReference> AddUploadedFileReferenceAsync(
+        Guid documentId,
         Guid accountId,
         StoredFileResult storedFileResult,
         PreparedUploadFile preparedUploadFile,
         CancellationToken cancellationToken)
     {
         var reference = UploadedFileReference.Create(
+            documentId,
             accountId,
             storedFileResult.BlobId,
             preparedUploadFile.FileName,

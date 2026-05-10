@@ -52,7 +52,9 @@ public sealed class StageDocumentFileHandler : IStageDocumentFileHandler
             .FindByIdAsync(request.UploadId, cancellationToken)
             .ConfigureAwait(false);
 
-        if (upload is null || upload.AccountId != accountId)
+        if (upload is null ||
+            upload.AccountId != accountId ||
+            upload.DocumentId != document.Id)
         {
             throw new NotFound().WithDetails($"Uploaded file '{request.UploadId}' was not found.");
         }

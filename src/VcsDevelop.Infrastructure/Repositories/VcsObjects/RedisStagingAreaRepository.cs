@@ -23,12 +23,18 @@ public sealed class RedisStagingAreaRepository : IStagingAreaRepository
         cancellationToken.ThrowIfCancellationRequested();
 
         var key = BuildKey(entry.DocumentId, entry.AccountId);
-        var entries = await ReadEntriesAsync(key).ConfigureAwait(false);
+        var payload = JsonSerializer.Serialize(entry, JsonSerializerOptions);
 
-        entries.RemoveAll(item => string.Equals(item.RepositoryPath, entry.RepositoryPath, StringComparison.Ordinal));
-        entries.Add(entry);
+        await _database.HashSetAsync(
+                key,
+                entry.RepositoryPath,
+                payload)
+            .ConfigureAwait(false);
 
-        await WriteEntriesAsync(key, entries).ConfigureAwait(false);
+        await _database.KeyExpireAsync(
+                key,
+                TimeSpan.FromHours(24))
+            .ConfigureAwait(false);
     }
 
     public async Task<IReadOnlyCollection<StagedFileEntry>> GetAllAsync(
@@ -38,7 +44,17 @@ public sealed class RedisStagingAreaRepository : IStagingAreaRepository
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        return await ReadEntriesAsync(BuildKey(documentId, accountId)).ConfigureAwait(false);
+        var key = BuildKey(documentId, accountId);
+        var values = await _database.HashValuesAsync(key).ConfigureAwait(false);
+
+        return values
+            .Where(redisValue => !redisValue.IsNullOrEmpty)
+            .Select(redisValue => JsonSerializer.Deserialize<StagedFileEntry>(
+                redisValue.ToString(),
+                JsonSerializerOptions))
+            .Where(entry => entry is not null)
+            .Select(entry => entry!)
+            .ToArray();
     }
 
     public async Task ClearAsync(Guid documentId, Guid accountId, CancellationToken cancellationToken = default)
@@ -57,16 +73,6 @@ public sealed class RedisStagingAreaRepository : IStagingAreaRepository
         }
 
         return JsonSerializer.Deserialize<List<StagedFileEntry>>(value.ToString(), JsonSerializerOptions) ?? [];
-    }
-
-    private async Task WriteEntriesAsync(string key, List<StagedFileEntry> entries)
-    {
-        var payload = JsonSerializer.Serialize(entries, JsonSerializerOptions);
-        await _database.StringSetAsync(
-                key,
-                payload,
-                expiry: TimeSpan.FromHours(24))
-            .ConfigureAwait(false);
     }
 
     private static string BuildKey(Guid documentId, Guid accountId)
