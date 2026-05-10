@@ -117,6 +117,24 @@ public class DocumentController : ControllerBase
         return Ok(response);
     }
 
+    [HttpPost("{id:guid}/commit")]
+    public async Task<ActionResult<CommitDocumentResponse>> CommitAsync(
+        Guid id,
+        [FromBody] CommitDocumentRequest request,
+        [FromServices] ICommitDocumentHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var command = CommitDocumentCommand.Create(id, request.Message);
+        var response = await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
+
+        return Ok(response);
+    }
+        return Ok(response);
+    }
+
     private static string? ValidateFileName(string fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))
