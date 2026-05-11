@@ -29,8 +29,13 @@ public class RequestContext : IRequestContext
     private Guid? GetAccountId()
     {
         var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(_tokenSettings.AccountIdClaimName);
-        return userIdClaim is not null
-            ? Guid.Parse(userIdClaim.Value)
+        if (userIdClaim is null)
+        {
+            return null;
+        }
+
+        return Guid.TryParse(userIdClaim.Value, out var accountId)
+            ? accountId
             : null;
     }
 }

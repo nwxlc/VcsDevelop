@@ -16,8 +16,8 @@ public class UserController : ControllerBase
 {
     [HttpPost("registration")]
     public async Task<ActionResult<AccountResponse>> RegistrationAsync(
-        [FromBody]RegistrationRequest request,
-        [FromServices]IRegistrationCommandHandler handler,
+        [FromBody] RegistrationRequest request,
+        [FromServices] IRegistrationCommandHandler handler,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -38,8 +38,8 @@ public class UserController : ControllerBase
 
     [HttpPost("login")]
     public async Task<ActionResult<AccountResponse>> LoginAsync(
-        [FromBody]LoginRequest request,
-        [FromServices]ILoginCommandHandler handler,
+        [FromBody] LoginRequest request,
+        [FromServices] ILoginCommandHandler handler,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -57,8 +57,8 @@ public class UserController : ControllerBase
     [Authorize]
     [HttpPost("logout")]
     public async Task<IActionResult> LogoutAsync(
-        [FromBody]LogoutRequest request,
-        [FromServices]ILogoutCommandHandler handler,
+        [FromBody] LogoutRequest request,
+        [FromServices] ILogoutCommandHandler handler,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -73,7 +73,7 @@ public class UserController : ControllerBase
     [HttpGet("{id:guid}", Name = "GetUserByIdAsync")]
     public async Task<ActionResult<AccountInfoResponse>> GetUserByIdAsync(
         Guid id,
-        [FromServices]IGetAccountByIdHandler handler,
+        [FromServices] IGetAccountByIdHandler handler,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(handler);
@@ -95,8 +95,8 @@ public class UserController : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> UpdateAsync(
         Guid id,
-        [FromBody]UpdateAccountRequest request,
-        [FromServices]IUpdateAccountHandler handler,
+        [FromBody] UpdateAccountRequest request,
+        [FromServices] IUpdateAccountHandler handler,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -117,5 +117,20 @@ public class UserController : ControllerBase
         {
             return NotFound();
         }
+    }
+
+    [HttpPost("refresh_access_token")]
+    public async Task<ActionResult<AccountResponse>> RefreshAccessTokenAsync(
+        [FromBody] RefreshAccessTokenRequest request,
+        [FromServices] IRefreshAccessTokenCommandHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var command = RefreshAccessTokenCommand.Create(request.RefreshToken);
+        var accountResponse = await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
+
+        return Ok(accountResponse);
     }
 }

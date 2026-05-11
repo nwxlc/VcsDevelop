@@ -6,6 +6,7 @@ public interface IAccountRepository
 {
     Task<Account?> FindByIdAsync(Guid? id, CancellationToken cancellationToken = default);
     Task<Account?> FindByEmailAsync(string email, CancellationToken cancellationToken = default);
+    Task<Account> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Account> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
     Task SetAsync(Account account, CancellationToken cancellationToken = default);
 }

@@ -43,6 +43,10 @@ public sealed class RedisRefreshTokenRepository : IRefreshTokenRepository
 
             _ = transaction.StringSetAsync(tokenKey, payload, tokenExpiresAt);
             _ = transaction.SortedSetAddAsync(userKey, refreshToken.TokenHash, score);
+            _ = transaction.KeyExpireAsync(
+                userKey,
+                refreshToken.ExpiresAt.UtcDateTime,
+                ExpireWhen.GreaterThanCurrentExpiry);
 
             var commited = await transaction
                 .ExecuteAsync()
@@ -99,13 +103,6 @@ public sealed class RedisRefreshTokenRepository : IRefreshTokenRepository
         try
         {
             var db = _redis.GetDatabase();
-
-            var token = await GetAsync(refreshToken.TokenHash, cancellationToken);
-            if (token is null)
-            {
-                return;
-            }
-
             var transaction = db.CreateTransaction();
 
             _ = transaction.KeyDeleteAsync(tokenKey);

@@ -8,4 +8,6 @@ public sealed class CommitMessage
     {
         Value = value;
     }
+
+    public static CommitMessage Create(string value) => new(value);
 }

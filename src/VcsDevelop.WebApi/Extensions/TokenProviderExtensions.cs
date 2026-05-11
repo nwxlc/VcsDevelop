@@ -14,10 +14,10 @@ public static class TokenProviderExtensions
         IConfiguration configuration)
     {
         services.AddOptions<TokenOption>().Bind(configuration.GetSection(TokenOption.Name));
-        
+
         services.AddSingleton<ITokenSettings>(provider =>
             provider.GetRequiredService<IOptions<TokenOption>>().Value);
-        
+
         services.AddSingleton<ITokenProvider, TokenProvider>();
         services.AddSingleton<ITokenValidationParametersFactory, TokenValidationParametersFactory>();
         services.AddSingleton<IRefreshTokenProvider, RefreshTokenProvider>();

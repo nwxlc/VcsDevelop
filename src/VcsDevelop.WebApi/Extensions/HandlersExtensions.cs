@@ -4,6 +4,8 @@ using VcsDevelop.Application.Accounts.QueryHandlers;
 using VcsDevelop.Application.VcsObjects.Documents.Abstractions;
 using VcsDevelop.Application.VcsObjects.Documents.CommandHandlers;
 using VcsDevelop.Application.VcsObjects.Documents.QueryHandlers;
+using VcsDevelop.Application.VcsObjects.Files.Abstractions;
+using VcsDevelop.Application.VcsObjects.Files.CommandHandlers;
 
 namespace VcsDevelop.WebApi.Extensions;
 
@@ -19,9 +21,13 @@ public static class HandlersExtensions
         services.AddScoped<ILogoutCommandHandler, LogoutCommandHandler>();
         services.AddScoped<IGetAccountByIdHandler, GetAccountByIdHandler>();
         services.AddScoped<IUpdateAccountHandler, UpdateAccountHandler>();
+        services.AddScoped<IRefreshAccessTokenCommandHandler, RefreshAccessTokenCommandHandler>();
 
         services.AddScoped<ICreateDocumentHandler, CreateDocumentHandler>();
         services.AddScoped<IGetDocumentByIdHandler, GetDocumentByIdHandler>();
+        services.AddScoped<IUploadFileHandler, UploadFileHandler>();
+        services.AddScoped<IStageDocumentFileHandler, StageDocumentFileHandler>();
+        services.AddScoped<ICommitDocumentHandler, CommitDocumentHandler>();
 
         return services;
     }
