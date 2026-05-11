@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options;
 using Minio;
 using VcsDevelop.Infrastructure.Options.Minio;
-//using VcsDevelop.Infrastructure.Services;
+using VcsDevelop.Infrastructure.Services;
 
 namespace VcsDevelop.WebApi.Extensions;
 
