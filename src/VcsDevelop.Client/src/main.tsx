@@ -5,8 +5,8 @@ import App from './App';
 
 import {BrowserRouter} from "react-router";
 
-//@ts-expect-error
-const root = ReactDOM.createRoot(document.getElementById('root'));
+
+const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(
     <React.StrictMode>
         <BrowserRouter>
