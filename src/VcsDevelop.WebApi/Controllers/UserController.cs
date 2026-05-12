@@ -31,7 +31,7 @@ public class UserController : ControllerBase
         var accountResponse = await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 
         return CreatedAtAction(
-            "GetById",
+            "GetUserById",
             new { id = accountResponse.AccountId },
             accountResponse);
     }
@@ -70,8 +70,8 @@ public class UserController : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("{id:guid}", Name = "GetById")]
-    public async Task<ActionResult<AccountInfoResponse>> GetByIdAsync(
+    [HttpGet("{id:guid}", Name = "GetUserByIdAsync")]
+    public async Task<ActionResult<AccountInfoResponse>> GetUserByIdAsync(
         Guid id,
         [FromServices] IGetAccountByIdHandler handler,
         CancellationToken cancellationToken)

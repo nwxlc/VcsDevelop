@@ -26,9 +26,6 @@ public static class WebApplicationExtensions
 
         app.UseProblemDetails();
 
-        app.MapOpenApi();
-        app.MapScalarApiReference();
-
         app.MapControllers();
 
         return app;
