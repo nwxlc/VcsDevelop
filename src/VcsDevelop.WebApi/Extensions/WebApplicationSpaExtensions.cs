@@ -13,7 +13,7 @@ public static class WebApplicationSpaExtensions
             ctx => !ctx.Request.Path.StartsWithSegments("/scalar")
                    && !ctx.Request.Path.StartsWithSegments("/openapi")
                    && !ctx.Request.Path.StartsWithSegments("/api"),
-            builder => 
+            builder =>
             {
                 builder.UseSpa(spa =>
                 {
@@ -24,7 +24,7 @@ public static class WebApplicationSpaExtensions
                 });
             }
         );
-        
+
         return app;
     }
 }
