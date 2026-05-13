@@ -21,7 +21,7 @@ const Header = () => {
         };
 
         checkToken();
-    }, [location.pathname]); // Проверяем при переходах
+    }, [location.pathname]); 
 
     return (
         <div className="header">

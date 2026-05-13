@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 
-const PullRequests = () => {
+const RepositoryBody = () => {
     return (
         <div>
             
@@ -8,4 +8,4 @@ const PullRequests = () => {
     );
 };
 
-export default PullRequests;
+export default RepositoryBody;

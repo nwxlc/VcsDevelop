@@ -1,15 +1,13 @@
 ﻿import React from 'react';
-import Header from "../components/GlobalComponents/Header.tsx";
-import LoginBody from "../components/LoginPage/LoginBody.tsx";
 import Footer from "../components/GlobalComponents/Footer.tsx";
-import WorkspaceHeader from "../components/GlobalComponents/WorkspaceHeader.tsx";
-import Repositories from "../components/Workspace/Repositories.tsx";
+import WorkspaceHeader from "../components/Workspace/WorkspaceHeader.tsx";
+import Account from "../components/Workspace/Account.tsx";
 
 const Workspace = () => {
     return (
-        <div>
+        <div className='container'>
             <WorkspaceHeader/>
-            <Repositories/>
+            <Account/>
             <Footer/>
         </div>
     );

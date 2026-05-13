@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 
-const Repositories = () => {
+const Account = () => {
     return (
         <div>
             
@@ -8,4 +8,4 @@ const Repositories = () => {
     );
 };
 
-export default Repositories;
+export default Account;

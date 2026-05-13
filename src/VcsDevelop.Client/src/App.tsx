@@ -5,12 +5,17 @@ import HomePage from "./pages/HomePage.tsx";
 import Login from "./pages/Login.tsx";
 import Workspace from "./pages/Workspace.tsx";
 import {useAuth} from "./hooks/useAuth.ts";
+import Repositories from "./pages/Repositories.tsx";
+import PullRequests from "./pages/PullRequests.tsx";
+import Repository from "./pages/Repository.tsx";
 
 
 function App() {
     const navigate = useNavigate();
     const location = useLocation();
     const { refreshToken } = useAuth();
+    const accessToken = localStorage.getItem("accessToken");
+    console.log(accessToken)
 
     useEffect(() => {
         const protectedRoutes = ["/workspace"];
@@ -35,6 +40,9 @@ function App() {
             <Route path="/" element={<HomePage/>}/>
             <Route path="/login" element={<Login/>}/>
             <Route path="/workspace" element={<Workspace/>}/>
+            <Route path="/repositories" element={<Repositories/>}/>
+            <Route path="/repository/:name" element={<Repository/>} />
+            <Route path="/pullrequests" element={<PullRequests/>}/>
         </Routes>
     )
 }
