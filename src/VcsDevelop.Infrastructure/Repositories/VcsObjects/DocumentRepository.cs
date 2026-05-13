@@ -43,6 +43,28 @@ public class DocumentRepository : BaseRepository, IDocumentRepository
         return document;
     }
 
+    public async Task<IEnumerable<Document>> GetAllByOwnerIdAsync(Guid ownerId,
+        int pageNumber,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        var queryable = _dbContext.Documents.AsNoTracking();
+
+        return await queryable
+            .Where(document => document.OwnerId == ownerId)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public async Task<int> GetCountByOwnerIdAsync(Guid ownerId, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Documents
+            .CountAsync(document => document.OwnerId == ownerId, cancellationToken)
+            .ConfigureAwait(false);
+    }
+
     public async Task<Document?> FindByIdAsync(
         Guid id,
         Guid ownerId,

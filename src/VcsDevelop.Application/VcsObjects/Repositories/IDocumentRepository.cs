@@ -18,5 +18,15 @@ public interface IDocumentRepository
         Guid id,
         CancellationToken cancellationToken = default);
 
+    Task<IEnumerable<Document>> GetAllByOwnerIdAsync(
+        Guid ownerId,
+        int pageNumber,
+        int pageSize,
+        CancellationToken cancellationToken = default);
+
+    Task<int> GetCountByOwnerIdAsync(
+        Guid ownerId,
+        CancellationToken cancellationToken = default);
+
     Task SetAsync(Document document, CancellationToken cancellationToken = default);
 }

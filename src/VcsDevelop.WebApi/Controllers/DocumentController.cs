@@ -42,6 +42,24 @@ public class DocumentController : ControllerBase
             new { id = documentId });
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetRepositoriesAsync(
+        [FromQuery] int page,
+        [FromQuery] int pageSize,
+        [FromServices] IGetDocumentsHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var query = GetDocumentsQuery.Create(page, pageSize);
+
+        var response = await handler
+            .HandleAsync(query, cancellationToken)
+            .ConfigureAwait(false);
+
+        return Ok(response);
+    }
+
     [HttpGet("{id:guid}", Name = "GetDocumentById")]
     public async Task<ActionResult<DocumentResponse>> GetByIdAsync(
         Guid id,
