@@ -151,6 +151,24 @@ public class DocumentController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("{id:guid}/tree")]
+    public async Task<ActionResult<RepositoryTreeResponse>> GetRepositoryTreeAsync(
+        Guid id,
+        [FromQuery] string? path,
+        [FromServices] IGetRepositoryTreeHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var query = GetRepositoryTreeQuery.Create(id, path);
+        var response = await handler.HandleAsync(query, cancellationToken)
+            .ConfigureAwait(false);
+
+        return Ok(response);
+    }
+        return Ok(response);
+    }
+
     private static string? ValidateFileName(string fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))
