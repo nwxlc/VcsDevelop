@@ -43,7 +43,7 @@ public class DocumentController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetRepositoriesAsync(
+    public async Task<IActionResult> GetDocumentsAsync(
         [FromQuery] int page,
         [FromQuery] int pageSize,
         [FromServices] IGetDocumentsHandler handler,
