@@ -43,7 +43,7 @@ public class DocumentController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetRepositoriesAsync(
+    public async Task<IActionResult> GetDocumentsAsync(
         [FromQuery] int page,
         [FromQuery] int pageSize,
         [FromServices] IGetDocumentsHandler handler,
@@ -147,6 +147,22 @@ public class DocumentController : ControllerBase
 
         var command = CommitDocumentCommand.Create(id, request.Message);
         var response = await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
+
+        return Ok(response);
+    }
+
+    [HttpGet("{id:guid}/tree")]
+    public async Task<ActionResult<RepositoryTreeResponse>> GetRepositoryTreeAsync(
+        Guid id,
+        [FromQuery] string? path,
+        [FromServices] IGetRepositoryTreeHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var query = GetRepositoryTreeQuery.Create(id, path);
+        var response = await handler.HandleAsync(query, cancellationToken)
+            .ConfigureAwait(false);
 
         return Ok(response);
     }

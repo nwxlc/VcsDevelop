@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0.100 AS build
 WORKDIR /src
 
 COPY Directory.Build.props ./
@@ -14,10 +14,7 @@ RUN dotnet restore src/VcsDevelop.WebApi/VcsDevelop.WebApi.csproj
 
 COPY . .
 
-RUN dotnet publish src/VcsDevelop.WebApi/VcsDevelop.WebApi.csproj \
-    -c Release \
-    -o /app/publish \
-    /p:UseAppHost=false
+RUN dotnet publish src/VcsDevelop.WebApi/VcsDevelop.WebApi.csproj -c Release -o /app/publish /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 
