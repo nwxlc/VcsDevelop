@@ -42,6 +42,7 @@ public sealed class GetDocumentByIdHandler : IGetDocumentByIdHandler
 
         return new DocumentResponse
         {
+            Id = document.Id,
             Name = document.Name,
             DefaultBranchName = document.DefaultBranchName,
             Title = document.Metadata.Title,
