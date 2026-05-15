@@ -50,6 +50,7 @@ public sealed class GetDocumentsHandler : IGetDocumentsHandler
 
         var documentsResponse = documents.Select(document => new DocumentResponse
             {
+                Id = document.Id,
                 Name = document.Name,
                 DefaultBranchName = document.DefaultBranchName,
                 Title = document.Metadata.Title,
