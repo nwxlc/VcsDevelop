@@ -1,39 +1,75 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
 const RepositoriesList = () => {
     const navigate = useNavigate();
+
+    interface Repository {
+        id: string;
+        name: string;
+    }
+    
+    // Состояния для данных
+    const [repositories, setRepositories] = useState<Repository[]>([]);
+    const [page, setPage] = useState(1);
+    const [pageSize] = useState(10); // Можно вынести в константы
+    const [totalCount, setTotalCount] = useState(0); // Если API возвращает общее кол-во
+
+    // Состояния UI
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [repoName, setRepoName] = useState('');
     const [createdRepoId, setCreatedRepoId] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     
-    const accessToken = localStorage.getItem('accessToken');
+
     
-    const repositories = [
-        { id: 'd73b2762-1234-4a51-9c32-1f7498302abc', name: 'frontend-core-library' },
-        { id: 'a42f8c12-5678-4b21-8d14-2e8509413def', name: 'data-processing-service' },
-        { id: 'b91e7a34-9012-4c31-7e25-3f9610524ghi', name: 'mobile-ui-kit' },
-        { id: 'c12d6b56-3456-4d41-6f36-4a0721635jkl', name: 'auth-provider-v2' },
-        { id: 'e53f5d78-7890-4e51-5a47-5b1832746mno', name: 'analytics-dashboard' },
-        { id: 'f64a4c90-1234-4f61-4b58-6c2943857pqr', name: 'deployment-scripts' },
-        { id: 'g75b3b01-5678-4g71-3c69-7d3054968stu', name: 'legacy-api-gateway' },
-        { id: 'h86c2a12-9012-4h81-2d70-8e4165079vwx', name: 'testing-framework-ext' },
-        { id: 'i97d1e23-3456-4i91-1e81-9f5276180yz1', name: 'documentation-assets' },
-        { id: 'j08e0f34-7890-4j01-0f92-0a6387291ab2', name: 'experimental-ai-module' },
-    ];
+
+    const accessToken = localStorage.getItem('accessToken');
+
+    // Функция загрузки данных
+    const fetchRepositories = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            // Согласно скриншоту: GET /api/repos?page=X&pageSize=Y
+            const response = await fetch(`http://localhost:5050/api/repos?page=${page}&pageSize=${pageSize}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                // ВАЖНО: Проверьте структуру ответа вашего API. 
+                // Если API возвращает массив напрямую: setRepositories(data);
+                // Если объект с метаданными: setRepositories(data.items); setTotalCount(data.total);
+                setRepositories(Array.isArray(data) ? data : data.items || []);
+            }
+        } catch (error) {
+            console.error('Ошибка при загрузке репозиториев:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [page, pageSize, accessToken]);
+
+    // Вызов загрузки при изменении страницы или монтировании
+    useEffect(() => {
+        fetchRepositories();
+    }, [fetchRepositories]);
 
     const handleRepoClick = (repo) => {
         navigate(`/repository/${repo.name}`, {
             state: { id: repo.id }
         });
     };
-    
+
     const handleCreate = async () => {
         if (!repoName.trim()) return;
         setIsLoading(true);
         try {
-            const response = await fetch('/api/repos/create', {
+            const response = await fetch('http://localhost:5050/api/repos/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -41,15 +77,17 @@ const RepositoriesList = () => {
                 },
                 body: JSON.stringify({
                     name: repoName,
-                    defaultBranchName: null,
-                    description: null,
-                    tags: ['']
+                    defaultBranchName: "main",
+                    description: "",
+                    tags: []
                 })
             });
 
             if (response.ok) {
                 const data = await response.json();
                 setCreatedRepoId(data.id || 'some-id');
+                // Обновляем список, чтобы увидеть новый репозиторий
+                fetchRepositories();
             }
         } catch (error) {
             console.error('Ошибка при создании:', error);
@@ -74,23 +112,47 @@ const RepositoriesList = () => {
             </div>
 
             <div className="repositories-container">
-                {repositories.map((repo) => (
-                    <div
-                        key={repo.id}
-                        className="repository-card"
-                        onClick={() => handleRepoClick(repo)} 
-                    >
-                        <span className="repository-name">{repo.name}</span>
-                    </div>
-                ))}
+                {isLoading && repositories.length === 0 ? (
+                    <p>Загрузка...</p>
+                ) : (
+                    repositories.map((repo) => (
+                        <div
+                            key={repo.id}
+                            className="repository-card"
+                            onClick={() => handleRepoClick(repo)}
+                        >
+                            <span className="repository-name">{repo.name}</span>
+                        </div>
+                    ))
+                )}
+
+                {!isLoading && repositories.length === 0 && (
+                    <p>Репозитории не найдены</p>
+                )}
             </div>
 
-            {/* Модальное окно */}
+            {/* Блок пагинации */}
+            <div className="pagination-controls">
+                <button
+                    disabled={page <= 1 || isLoading}
+                    onClick={() => setPage(prev => prev - 1)}
+                >
+                    Назад
+                </button>
+                <span> Страница {page} </span>
+                <button
+                    disabled={repositories.length < pageSize || isLoading}
+                    onClick={() => setPage(prev => prev + 1)}
+                >
+                    Вперед
+                </button>
+            </div>
+
+            {/* Модальное окно (остается без изменений в логике, добавлена только очистка) */}
             {isModalOpen && (
                 <div className="modal-overlay" onClick={closeModal}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <button className="modal-close" onClick={closeModal}>&times;</button>
-
                         {!createdRepoId ? (
                             <>
                                 <h3>Новый репозиторий</h3>
@@ -113,15 +175,11 @@ const RepositoriesList = () => {
                             <div className="success-message">
                                 <h3>Успешно создано!</h3>
                                 <div className="modal-actions">
-                                    <button className="secondary-btn" onClick={closeModal}>
-                                        Закрыть
-                                    </button>
+                                    <button className="secondary-btn" onClick={closeModal}>Закрыть</button>
                                     <button
                                         className="primary-btn"
                                         onClick={() => {
-                                            navigate(`/repository/${repoName}`, {
-                                                state: { id: createdRepoId }
-                                            });
+                                            navigate(`/repository/${repoName}`, { state: { id: createdRepoId } });
                                             closeModal();
                                         }}
                                     >
