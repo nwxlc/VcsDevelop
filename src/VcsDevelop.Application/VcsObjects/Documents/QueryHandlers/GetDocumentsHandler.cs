@@ -69,6 +69,7 @@ public sealed class GetDocumentsHandler : IGetDocumentsHandler
                 CurrentPage = request.PageNumber,
                 PageSize = request.PageSize,
                 TotalCount = totalCount,
+                TotalPages = totalPages,
                 HasNext = request.PageNumber < totalPages,
                 HasPrevious = request.PageNumber > 1
             }
