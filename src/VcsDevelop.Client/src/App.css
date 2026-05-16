@@ -399,7 +399,7 @@ p {
     margin-bottom: 40px;
 }
 
-.add-btn, .submit-btn, .primary-btn {
+.add-btn, .submit-btn, .primary-btn, .repo-btn-big {
     background-image: linear-gradient(90deg, #c618d3, #1a12f8, #c618d3);
     text-transform: lowercase;
     background-size: 200% auto;
@@ -416,13 +416,13 @@ p {
     justify-content: center;
 }
 
-.add-btn:hover, .submit-btn:hover, .primary-btn:hover {
+.add-btn:hover, .submit-btn:hover, .primary-btn:hover, .repo-btn-big:hover {
     background-position: right center;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(198, 24, 211, 0.4);
 }
 
-.add-btn:active, .submit-btn:active, .primary-btn:active {
+.add-btn:active, .submit-btn:active, .primary-btn:active, .repo-btn-big:active {
     transform: translateY(0);
 }
 
@@ -498,4 +498,219 @@ p {
     padding: 12px;
     border-radius: 8px;
     cursor: pointer;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.page-arrow-btn, .page-num-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; /* Делаем всё круглым */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.page-arrow-btn:hover:not(:disabled) {
+    background-position: right center;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(198, 24, 211, 0.4);
+}
+
+.page-arrow-btn:disabled {
+    filter: grayscale(1);
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.page-arrow-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.page-info {
+    font-size: 1.1rem;
+    font-weight: 500;
+    min-width: 100px;
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: lowercase;
+}
+
+.page-numbers {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+
+.page-num-btn:hover:not(.active):not(.dots) {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ЭТОТ КЛАСС ПОДСВЕЧИВАЕТ ТЕКУЩУЮ СТРАНИЦУ */
+.page-num-btn.active {
+    background-image: linear-gradient(90deg, #c618d3, #1a12f8, #c618d3);
+    background-size: 200% auto;
+    border: none;
+    box-shadow: 0 0 15px rgba(198, 24, 211, 0.5);
+    font-weight: bold;
+}
+
+.page-num-btn.dots {
+    border: none;
+    background: transparent;
+    cursor: default;
+}
+
+
+.repo-container {
+    padding: 20px;
+    color: #fff; 
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 20px; /* Отступы между всеми блоками по 20px */
+}
+
+.repo-loading {
+    padding: 40px;
+    text-align: center;
+    font-size: 18px;
+    color: #fff;
+}
+
+.repo-hidden-input {
+    display: none;
+}
+
+/* --- Пустой репозиторий --- */
+.repo-empty-wrapper {
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Отступы между надписью, окном и кнопкой по 20px */
+}
+
+.repo-empty-wrapper h3 {
+    margin: 0;
+    color: #fff;
+}
+
+/* Тёмное окно для загрузки файлов с эффектом волны */
+.repo-drop-zone {
+    width: 100%;
+    height: 400px; /* Высота ровно 400px */
+    background-color: #2d2d2d; /* Тёмный цвет */
+    cursor: pointer;
+    /* Делаем прозрачный бордер, чтобы подготовить для него место */
+    border: 2px dashed #c618d3;
+    border-radius: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+/* Эффект при наведении (Hover) - Градиент в виде волны */
+.repo-drop-zone:hover {
+    border: 2px solid transparent;
+
+    background-image: linear-gradient(#2d2d2d, #2d2d2d), linear-gradient(90deg, #c618d3, #2a12f8);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+
+    box-shadow:
+            0 0 20px rgba(198, 24, 211, 0.4),  /* Внешнее розовое свечение */
+            0 0 30px rgba(42, 18, 248, 0.25),   /* Внешнее синее свечение */
+            inset 0 0 15px rgba(198, 24, 211, 0.1); /* Внутреннее мягкое розовое свечение */
+
+    transform: scale(1.005); /* Легкое увеличение для интерактивности */
+}
+
+/* Класс для состояния Drag-and-Drop (когда файл перетаскивают) */
+.repo-drop-zone.active {
+    border: 2px dashed #007bff;
+    background: #edf5ff;
+    transform: scale(1.01);
+
+    /* Отключаем все ховер-эффекты */
+    box-shadow: none;
+    background-image: none;
+    background-origin: initial;
+    background-clip: initial;
+}
+
+.repo-drop-text {
+    margin: 0;
+    font-size: 18px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* --- Заполненный репозиторий --- */
+.repo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 12px;
+}
+
+.repo-btn-small {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #007bff;
+    background-color: #fff;
+    border: 1px solid #007bff;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.repo-btn-small:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.repo-content-box {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    padding: 16px;
+}
+
+.repo-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.repo-list-item {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 15px;
+}
+
+.repo-list-item:last-child {
+    border-bottom: none;
 }

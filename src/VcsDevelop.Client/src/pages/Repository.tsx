@@ -5,7 +5,7 @@ import Footer from "../components/GlobalComponents/Footer";
 
 const Repository = () => {
     return (
-        <div className='container'>
+        <div className='container no-margin'>
             <WorkspaceHeader/>
             <RepositoryBody/>
             <Footer/>

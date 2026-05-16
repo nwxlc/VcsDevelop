@@ -1,36 +1,67 @@
 ﻿import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
+interface Repository {
+    id: string;
+    name: string;
+}
+
 const RepositoriesList = () => {
     const navigate = useNavigate();
 
-    interface Repository {
-        id: string;
-        name: string;
-    }
-    
     // Состояния для данных
     const [repositories, setRepositories] = useState<Repository[]>([]);
     const [page, setPage] = useState(1);
-    const [pageSize] = useState(10); // Можно вынести в константы
-    const [totalCount, setTotalCount] = useState(0); // Если API возвращает общее кол-во
+    const [pageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(1); // Храним общее число страниц из метаданных
 
     // Состояния UI
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [repoName, setRepoName] = useState('');
-    const [createdRepoId, setCreatedRepoId] = useState(null);
+    const [createdRepoId, setCreatedRepoId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    
-
-    
 
     const accessToken = localStorage.getItem('accessToken');
+
+    // Умная логика пагинации
+    const getPaginationRange = () => {
+        const range: (number | string)[] = [];
+        const delta = 2; // Сколько страниц показывать рядом с текущей
+
+        if (totalPages <= 7) {
+            // Если страниц мало, показываем все
+            for (let i = 1; i <= totalPages; i++) range.push(i);
+        } else {
+            // Всегда добавляем первую страницу
+            range.push(1);
+
+            if (page > delta + 2) {
+                range.push('...');
+            }
+
+            // Рассчитываем середину
+            const start = Math.max(2, page - delta);
+            const end = Math.min(totalPages - 1, page + delta);
+
+            for (let i = start; i <= end; i++) {
+                range.push(i);
+            }
+
+            if (page < totalPages - (delta + 1)) {
+                range.push('...');
+            }
+
+            // Всегда добавляем последнюю страницу
+            range.push(totalPages);
+        }
+
+        return range;
+    };
 
     // Функция загрузки данных
     const fetchRepositories = useCallback(async () => {
         setIsLoading(true);
         try {
-            // Согласно скриншоту: GET /api/repos?page=X&pageSize=Y
             const response = await fetch(`http://localhost:5050/api/repos?page=${page}&pageSize=${pageSize}`, {
                 method: 'GET',
                 headers: {
@@ -40,12 +71,14 @@ const RepositoriesList = () => {
             });
 
             if (response.ok) {
-                const data = await response.json();
+                const result = await response.json();
 
-                // ВАЖНО: Проверьте структуру ответа вашего API. 
-                // Если API возвращает массив напрямую: setRepositories(data);
-                // Если объект с метаданными: setRepositories(data.items); setTotalCount(data.total);
-                setRepositories(Array.isArray(data) ? data : data.items || []);
+                // Учитываем твою структуру: данные в result.data, метаданные в result.metadata
+                setRepositories(result.data || []);
+
+                if (result.metadata) {
+                    setTotalPages(result.metadata.totalPages || 1);
+                }
             }
         } catch (error) {
             console.error('Ошибка при загрузке репозиториев:', error);
@@ -54,12 +87,11 @@ const RepositoriesList = () => {
         }
     }, [page, pageSize, accessToken]);
 
-    // Вызов загрузки при изменении страницы или монтировании
     useEffect(() => {
         fetchRepositories();
     }, [fetchRepositories]);
 
-    const handleRepoClick = (repo) => {
+    const handleRepoClick = (repo: Repository) => {
         navigate(`/repository/${repo.name}`, {
             state: { id: repo.id }
         });
@@ -69,7 +101,7 @@ const RepositoriesList = () => {
         if (!repoName.trim()) return;
         setIsLoading(true);
         try {
-            const response = await fetch('http://localhost:5050/api/repos/create', {
+            const response = await fetch('/api/repos/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -86,7 +118,6 @@ const RepositoriesList = () => {
             if (response.ok) {
                 const data = await response.json();
                 setCreatedRepoId(data.id || 'some-id');
-                // Обновляем список, чтобы увидеть новый репозиторий
                 fetchRepositories();
             }
         } catch (error) {
@@ -113,8 +144,8 @@ const RepositoriesList = () => {
 
             <div className="repositories-container">
                 {isLoading && repositories.length === 0 ? (
-                    <p>Загрузка...</p>
-                ) : (
+                    <p className="status-text">Загрузка...</p>
+                ) : repositories.length > 0 ? (
                     repositories.map((repo) => (
                         <div
                             key={repo.id}
@@ -124,31 +155,48 @@ const RepositoriesList = () => {
                             <span className="repository-name">{repo.name}</span>
                         </div>
                     ))
-                )}
-
-                {!isLoading && repositories.length === 0 && (
-                    <p>Репозитории не найдены</p>
+                ) : (
+                    <p className="status-text">Репозитории не найдены</p>
                 )}
             </div>
 
             {/* Блок пагинации */}
             <div className="pagination-controls">
                 <button
+                    className="page-arrow-btn"
                     disabled={page <= 1 || isLoading}
                     onClick={() => setPage(prev => prev - 1)}
                 >
-                    Назад
+                    <svg viewBox="0 0 24 24" width="18" fill="white">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                    </svg>
                 </button>
-                <span> Страница {page} </span>
+
+                <div className="page-numbers">
+                    {getPaginationRange().map((p, index) => (
+                        <button
+                            key={index}
+                            className={`page-num-btn ${p === page ? 'active' : ''} ${p === '...' ? 'dots' : ''}`}
+                            disabled={p === '...' || isLoading}
+                            onClick={() => typeof p === 'number' && setPage(p)}
+                        >
+                            {p}
+                        </button>
+                    ))}
+                </div>
+
                 <button
-                    disabled={repositories.length < pageSize || isLoading}
+                    className="page-arrow-btn"
+                    disabled={page >= totalPages || isLoading}
                     onClick={() => setPage(prev => prev + 1)}
                 >
-                    Вперед
+                    <svg viewBox="0 0 24 24" width="18" fill="white">
+                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+                    </svg>
                 </button>
             </div>
 
-            {/* Модальное окно (остается без изменений в логике, добавлена только очистка) */}
+            {/* Модальное окно */}
             {isModalOpen && (
                 <div className="modal-overlay" onClick={closeModal}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
