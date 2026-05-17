@@ -17,6 +17,7 @@ namespace VcsDevelop.WebApi.Controllers;
 public class DocumentController : ControllerBase
 {
     private const int MaxFileNameLength = 255;
+    private const int MaxPageSize = 100;
 
     [HttpPost("create")]
     public async Task<IActionResult> CreateDocumentAsync(
@@ -50,6 +51,16 @@ public class DocumentController : ControllerBase
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(handler);
+
+        if (page < 1)
+        {
+            return BadRequest("Page must be greater than or equal to 1.");
+        }
+
+        if (pageSize is < 1 or > MaxPageSize)
+        {
+            return BadRequest($"Page size must be between 1 and {MaxPageSize}.");
+        }
 
         var query = GetDocumentsQuery.Create(page, pageSize);
 
@@ -160,11 +171,54 @@ public class DocumentController : ControllerBase
     {
         ArgumentNullException.ThrowIfNull(handler);
 
-        var query = GetRepositoryTreeQuery.Create(id, path);
-        var response = await handler.HandleAsync(query, cancellationToken)
-            .ConfigureAwait(false);
+        try
+        {
+            var query = GetRepositoryTreeQuery.Create(id, path);
+            var response = await handler.HandleAsync(query, cancellationToken)
+                .ConfigureAwait(false);
 
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+    }
+
+    [HttpGet("{id:guid}/blob")]
+    public async Task<ActionResult<RepositoryBlobResponse>> GetBlobAsync(
+        Guid id,
+        [FromQuery] string? path,
+        [FromServices] IGetRepositoryBlobHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return BadRequest("Path is required.");
+        }
+
+        try
+        {
+            var getRepositoryBlobQuery = GetRepositoryBlobQuery.Create(id, path);
+            var response = await handler.HandleAsync(getRepositoryBlobQuery, cancellationToken)
+                .ConfigureAwait(false);
+
+            return Ok(response);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(exception.Message);
+        }
     }
 
     private static string? ValidateFileName(string fileName)

@@ -19,13 +19,5 @@ await app.EnsureMinioBucketExistsAsync();
 await app.ApplyMigrationsAsync();
 
 app.ConfigureMiddleware();
-app.ConfigureSpa();
-
-app.UseDefaultFiles();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.MapFallbackToFile("index.html");
 
 app.Run();
