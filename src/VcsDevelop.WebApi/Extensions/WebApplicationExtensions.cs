@@ -1,6 +1,7 @@
 using Hellang.Middleware.ProblemDetails;
 using Scalar.AspNetCore;
 using Serilog;
+using VcsDevelop.Core.Logging;
 using VcsDevelop.Infrastructure.Services;
 
 namespace VcsDevelop.WebApi.Extensions;
@@ -13,11 +14,16 @@ public static class WebApplicationExtensions
 
         app.UseSerilogRequestLogging();
 
+        app.InitializeLogManager();
+
         var useHttpsRedirection = app.Configuration.GetValue("Http:UseHttpsRedirection", true);
         if (useHttpsRedirection)
         {
             app.UseHttpsRedirection();
         }
+
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
 
         app.UseRouting();
 
@@ -27,6 +33,8 @@ public static class WebApplicationExtensions
         app.UseProblemDetails();
 
         app.MapControllers();
+        app.ConfigureSpa();
+        app.MapFallbackToFile("index.html");
 
         return app;
     }
@@ -39,6 +47,13 @@ public static class WebApplicationExtensions
         var initializer = scope.ServiceProvider.GetRequiredService<MinioBucketInitializer>();
         await initializer.EnsureBucketExistsAsync().ConfigureAwait(false);
 
+        return app;
+    }
+
+    private static WebApplication InitializeLogManager(this WebApplication app)
+    {
+        var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
+        LogManager.Initialize(loggerFactory);
         return app;
     }
 }
