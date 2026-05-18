@@ -23,23 +23,19 @@ const RepositoriesList = () => {
 
     const accessToken = localStorage.getItem('accessToken');
 
-    // Умная логика пагинации
     const getPaginationRange = () => {
         const range: (number | string)[] = [];
-        const delta = 2; // Сколько страниц показывать рядом с текущей
+        const delta = 2; 
 
         if (totalPages <= 7) {
-            // Если страниц мало, показываем все
             for (let i = 1; i <= totalPages; i++) range.push(i);
         } else {
-            // Всегда добавляем первую страницу
             range.push(1);
 
             if (page > delta + 2) {
                 range.push('...');
             }
 
-            // Рассчитываем середину
             const start = Math.max(2, page - delta);
             const end = Math.min(totalPages - 1, page + delta);
 
@@ -51,7 +47,6 @@ const RepositoriesList = () => {
                 range.push('...');
             }
 
-            // Всегда добавляем последнюю страницу
             range.push(totalPages);
         }
 
@@ -73,7 +68,6 @@ const RepositoriesList = () => {
             if (response.ok) {
                 const result = await response.json();
 
-                // Учитываем твою структуру: данные в result.data, метаданные в result.metadata
                 setRepositories(result.data || []);
 
                 if (result.metadata) {

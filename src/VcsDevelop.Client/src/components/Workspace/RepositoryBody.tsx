@@ -1,11 +1,11 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router';
+import { useFileViewer } from '../../hooks/useFileViewer.ts';
 
-// Описываем структуру файла, основанную на поле "entries" из скриншота
 interface RepoEntry {
     name: string;
     path: string;
-    type: string; // "file" или "dir" / "string"
+    type: string;
     blobId: string | null;
 }
 
@@ -20,13 +20,25 @@ const RepositoryBody: React.FC = () => {
 
     const token = localStorage.getItem('accessToken');
 
+    const {
+        isFileModalOpen,
+        fileData,
+        isFileLoading,
+        openFile,
+        closeFileModal
+    } = useFileViewer(repoId, token);
+
     const [filesList, setFilesList] = useState<RepoEntry[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isDragging, setIsDragging] = useState<boolean>(false);
+    const [isUploading, setIsUploading] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const treeUrl = `/api/repos/${repoId}/tree`;
-    const uploadUrl = `/api/repos/${repoId}/upload`;
+    const host = 'http://localhost:5050';
+    const treeUrl = `${host}/api/repos/${repoId}/tree`;
+    const uploadUrl = `${host}/api/repos/${repoId}/upload`;
+    const stageUrl = `${host}/api/repos/${repoId}/stage`;
+    const commitUrl = `${host}/api/repos/${repoId}/commit`;
 
     const fetchRepositoryTree = async () => {
         if (!repoId) return;
@@ -39,8 +51,6 @@ const RepositoryBody: React.FC = () => {
             });
             if (response.ok) {
                 const data = await response.json();
-
-                // Согласно схеме, файлы лежат в свойстве data.entries
                 if (data && Array.isArray(data.entries)) {
                     setFilesList(data.entries);
                 } else {
@@ -64,39 +74,84 @@ const RepositoryBody: React.FC = () => {
         }
     }, [repoId]);
 
-    const uploadFiles = async (files: FileList | null) => {
+    const handleUploadPipeline = async (files: FileList | null) => {
         if (!files || files.length === 0 || !repoId) return;
 
-        const formData = new FormData();
-        for (let i = 0; i < files.length; i++) {
-            formData.append('File', files[i]);
-        }
+        setIsUploading(true);
 
         try {
-            const response = await fetch(uploadUrl, {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+
+                const formData = new FormData();
+                formData.append('File', file);
+
+                const uploadResponse = await fetch(uploadUrl, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${token || ''}`
+                    },
+                    body: formData
+                });
+
+                if (!uploadResponse.ok) {
+                    throw new Error(`Не удалось загрузить файл ${file.name}. Статус: ${uploadResponse.status}`);
+                }
+
+                const uploadData = await uploadResponse.json();
+                const uploadId = typeof uploadData === 'string' ? uploadData : uploadData.id || uploadData.uploadId;
+
+                if (!uploadId) {
+                    throw new Error(`Отсутствует uploadId для файла ${file.name}`);
+                }
+
+                const stageResponse = await fetch(stageUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token || ''}`
+                    },
+                    body: JSON.stringify({
+                        uploadId: uploadId,
+                        repositoryPath: file.name
+                    })
+                });
+
+                if (!stageResponse.ok) {
+                    throw new Error(`Не удалось проиндексировать (stage) файл ${file.name}`);
+                }
+            }
+
+            const commitResponse = await fetch(commitUrl, {
                 method: 'POST',
                 headers: {
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token || ''}`
                 },
-                body: formData
+                body: JSON.stringify({
+                    message: `uploaded ${files.length} file(s) via web ui`
+                })
             });
 
-            if (response.ok) {
-                alert('Успешно загружено!');
-                // После успешной загрузки обновляем дерево файлов
+            if (commitResponse.ok) {
+                alert('Файлы успешно загружены, застейджены и закоммичены!');
                 fetchRepositoryTree();
             } else {
-                alert(`Ошибка при загрузке файлов. Статус: ${response.status}`);
+                alert(`Ошибка при создании коммита. Статус: ${commitResponse.status}`);
             }
-        } catch (error) {
-            console.error('Ошибка отправки:', error);
+
+        } catch (error: any) {
+            console.error('Ошибка в процессе публикации файлов:', error);
+            alert(error.message || 'Произошла непредвиденная ошибка при загрузке');
+        } finally {
+            setIsUploading(false);
         }
     };
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setIsDragging(false);
-        uploadFiles(e.dataTransfer.files);
+        handleUploadPipeline(e.dataTransfer.files);
     };
 
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -109,7 +164,7 @@ const RepositoryBody: React.FC = () => {
     }
 
     if (isLoading) {
-        return <div className="repo-loading">Загрузка...</div>;
+        return <div className="repo-loading">Загрузка дерева репозитория...</div>;
     }
 
     const isEmpty = filesList.length === 0;
@@ -121,8 +176,14 @@ const RepositoryBody: React.FC = () => {
                 ref={fileInputRef}
                 className="repo-hidden-input"
                 multiple
-                onChange={(e) => uploadFiles(e.target.files)}
+                onChange={(e) => handleUploadPipeline(e.target.files)}
             />
+
+            {isUploading && (
+                <div className="repo-loading" style={{ color: '#c618d3', fontWeight: 'bold' }}>
+                    Выполняется загрузка, индексация и коммит файлов...
+                </div>
+            )}
 
             {isEmpty ? (
                 <div className="repo-empty-wrapper">
@@ -135,35 +196,70 @@ const RepositoryBody: React.FC = () => {
                         className={`repo-drop-zone ${isDragging ? 'active' : ''}`}
                     >
                         <p className="repo-drop-text">
-                            {isDragging ? 'Отпустите файлы сюда' : 'Перетащите файлы сюда для загрузки'}
+                            {isDragging ? 'отпустите файлы сюда' : 'перетащите файлы сюда для загрузки'}
                         </p>
                     </div>
 
-                    <button onClick={() => fileInputRef.current?.click()} className="repo-btn-big">
-                        Выбрать файлы вручную
+                    <button onClick={() => fileInputRef.current?.click()} className="primary-btn">
+                        выбрать файлы вручную
                     </button>
                 </div>
             ) : (
                 <div>
                     <div className="repo-header">
                         <h2>Содержимое репозитория</h2>
-                        <button onClick={() => fileInputRef.current?.click()} className="repo-btn-small">
-                            Загрузить файл
+                        <button onClick={() => fileInputRef.current?.click()} className="primary-btn small">
+                            загрузить файл
                         </button>
                     </div>
 
                     <div className="repo-content-box">
                         <ul className="repo-list">
+                            {/* Шапка таблицы — убираем класс интерактивности клика */}
+                            <li className="repo-list-header">
+                                <span>Название</span>
+                                <span className="repo-file-type">Тип</span>
+                            </li>
                             {filesList.map((file, index) => (
-                                <li key={file.blobId || index} className="repo-list-item">
-                                    {/* Выводим имя файла/папки из объекта entries */}
-                                    {file.name}
-                                    <span style={{ fontSize: '12px', color: '#888', marginLeft: '10px' }}>
-                                        ({file.type})
-                                    </span>
+                                <li
+                                    key={file.blobId || index}
+                                    className="repo-list-item clickable"
+                                    onClick={() => openFile(file.path)} // Вызов функции открытия при клике
+                                >
+                                    <span>{file.name}</span>
+                                    <span className="repo-file-type">{file.type}</span>
                                 </li>
                             ))}
                         </ul>
+                    </div>
+                </div>
+            )}
+
+            {/* Модальное окно просмотра содержимого файла */}
+            {isFileModalOpen && (
+                <div className="modal-overlay" onClick={closeFileModal}>
+                    <div className="modal-content file-viewer-modal" onClick={(e) => e.stopPropagation()}>
+                        <button className="modal-close" onClick={closeFileModal}>&times;</button>
+
+                        {isFileLoading ? (
+                            <div className="repo-loading">Загрузка содержимого файла...</div>
+                        ) : fileData ? (
+                            <div className="file-display-container">
+                                <div className="file-viewer-header">
+                                    <h3>{fileData.path.split('/').pop()}</h3>
+                                    <span className="file-size-badge">Размер: {fileData.size} байт</span>
+                                </div>
+                                <hr />
+                                {/* Тэг pre сохраняет форматирование кода и переносы строк */}
+                                <pre className="file-content-view">
+                                    {fileData.content}
+                                </pre>
+                            </div>
+                        ) : (
+                            <div className="repo-loading" style={{ color: 'red' }}>
+                                Не удалось загрузить данные файла.
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

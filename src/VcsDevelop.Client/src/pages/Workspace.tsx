@@ -5,7 +5,7 @@ import Account from "../components/Workspace/Account.tsx";
 
 const Workspace = () => {
     return (
-        <div className='container'>
+        <div className='container no-margin'>
             <WorkspaceHeader/>
             <Account/>
             <Footer/>
