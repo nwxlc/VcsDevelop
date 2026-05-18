@@ -6,7 +6,6 @@ using VcsDevelop.Application.Accounts.Entities.Queries;
 using VcsDevelop.Domain.Accounts;
 using VcsDevelop.Domain.Accounts.Commands;
 using VcsDevelop.WebApi.Contracts.Accounts;
-using LoginRequest = VcsDevelop.WebApi.Contracts.Accounts.LoginRequest;
 
 namespace VcsDevelop.WebApi.Controllers;
 
@@ -31,9 +30,10 @@ public class UserController : ControllerBase
         var accountResponse = await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 
         return CreatedAtAction(
-            "GetUserById",
-            new { id = accountResponse.AccountId },
-            accountResponse);
+            actionName: "GetUserById",
+            controllerName: "User",
+            routeValues: new { id = accountResponse.AccountId },
+            value: accountResponse);
     }
 
     [HttpPost("login")]
@@ -70,7 +70,7 @@ public class UserController : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("{id:guid}", Name = "GetUserByIdAsync")]
+    [HttpGet("{id:guid}")]
     public async Task<ActionResult<AccountInfoResponse>> GetUserByIdAsync(
         Guid id,
         [FromServices] IGetAccountByIdHandler handler,

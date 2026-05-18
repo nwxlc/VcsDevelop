@@ -5,6 +5,7 @@ namespace VcsDevelop.Infrastructure.Auth;
 
 public sealed class RedisRefreshTokenRepository : IRefreshTokenRepository
 {
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new(JsonSerializerDefaults.Web);
     private const string TokenKeyPrefix = "refresh_token:";
     private const string UserTokensKeyPrefix = "user_tokens:";
 
@@ -31,7 +32,7 @@ public sealed class RedisRefreshTokenRepository : IRefreshTokenRepository
             return;
         }
 
-        var payload = JsonSerializer.Serialize(refreshToken);
+        var payload = JsonSerializer.Serialize(refreshToken, JsonSerializerOptions);
 
         var score = (double)refreshToken.ExpiresAt.ToUnixTimeSeconds();
 
@@ -85,7 +86,7 @@ public sealed class RedisRefreshTokenRepository : IRefreshTokenRepository
                 return null;
             }
 
-            return JsonSerializer.Deserialize<RefreshToken>(value.ToString());
+            return JsonSerializer.Deserialize<RefreshToken>(value.ToString(), JsonSerializerOptions);
         }
         catch (Exception ex)
         {

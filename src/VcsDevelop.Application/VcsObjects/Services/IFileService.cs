@@ -8,6 +8,10 @@ public interface IFileService
         long length,
         CancellationToken cancellationToken);
 
+    Task<Stream> DownloadFileAsync(
+        string key,
+        CancellationToken cancellationToken);
+
     Task DeleteFileAsync(
         string key,
         CancellationToken cancellationToken);

@@ -52,8 +52,8 @@ public sealed class UploadedFileReference
 
         return new UploadedFileReference(
             Guid.NewGuid(),
-            accountId,
             documentId,
+            accountId,
             blobId,
             fileName,
             objectKey,

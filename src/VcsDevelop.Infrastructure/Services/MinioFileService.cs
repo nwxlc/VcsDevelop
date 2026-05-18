@@ -52,6 +52,31 @@ public sealed class MinioFileService : IFileService
             .ConfigureAwait(false);
     }
 
+    public async Task<Stream> DownloadFileAsync(
+        string key,
+        CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+
+        var targetBucketName = _options.BucketName;
+        if (string.IsNullOrWhiteSpace(targetBucketName))
+        {
+            throw new InvalidOperationException("MinIO bucket name is not configured.");
+        }
+
+        var output = new MemoryStream();
+
+        await _minioClient
+            .GetObjectAsync(new GetObjectArgs()
+                .WithBucket(targetBucketName)
+                .WithObject(key)
+                .WithCallbackStream(stream => stream.CopyTo(output)), cancellationToken)
+            .ConfigureAwait(false);
+
+        output.Position = 0;
+        return output;
+    }
+
     public async Task DeleteFileAsync(
         string key,
         CancellationToken cancellationToken)
