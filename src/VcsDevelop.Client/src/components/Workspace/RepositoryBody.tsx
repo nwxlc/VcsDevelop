@@ -142,9 +142,9 @@ const RepositoryBody: React.FC = () => {
                 alert(`Ошибка при создании коммита. Статус: ${commitResponse.status}`);
             }
 
-        } catch (error: any) {
-            console.error('Ошибка в процессе публикации файлов:', error);
-            alert(error.message || 'Произошла непредвиденная ошибка при загрузке');
+        } catch (error) {
+            console.error('Ошибка в процессе публикации файлов');
+            alert('Произошла непредвиденная ошибка при загрузке');
         } finally {
             setIsUploading(false);
         }
