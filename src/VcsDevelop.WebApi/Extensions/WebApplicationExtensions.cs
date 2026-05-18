@@ -22,18 +22,20 @@ public static class WebApplicationExtensions
             app.UseHttpsRedirection();
         }
 
-        app.UseDefaultFiles();
-        app.UseStaticFiles();
-
-        app.UseRouting();
-
         app.UseAuthentication();
         app.UseAuthorization();
 
         app.UseProblemDetails();
 
         app.MapControllers();
+
         app.ConfigureSpa();
+
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
+
+        app.UseRouting();
+
         app.MapFallbackToFile("index.html");
 
         return app;

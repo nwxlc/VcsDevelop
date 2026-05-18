@@ -67,6 +67,7 @@ const LoginBody: React.FC = () => {
             if (response.ok) {
                 const data = await response.json();
                 localStorage.setItem("accessToken", data.accessToken.value);
+                localStorage.setItem("accessTokenExpiresAt", data.accessToken.expirationDate);
                 localStorage.setItem("refreshToken", data.refreshToken.value);
                 localStorage.setItem("accountId", data.accountId);
                 navigate("/workspace");
