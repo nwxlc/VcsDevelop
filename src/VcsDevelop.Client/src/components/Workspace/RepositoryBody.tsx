@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+﻿import React, {useState, useEffect, useRef, useCallback} from 'react';
 import { useLocation } from 'react-router';
 import { useFileViewer } from '../../hooks/useFileViewer.ts';
 
@@ -40,7 +40,7 @@ const RepositoryBody: React.FC = () => {
     const stageUrl = `${host}/api/repos/${repoId}/stage`;
     const commitUrl = `${host}/api/repos/${repoId}/commit`;
 
-    const fetchRepositoryTree = async () => {
+    const fetchRepositoryTree = useCallback(async () => {
         if (!repoId) return;
         setIsLoading(true);
         try {
@@ -66,13 +66,15 @@ const RepositoryBody: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [repoId, treeUrl, token]); // <-- Указываем внешние переменные, от которых зависит функция
 
+
+// 3. Передаем саму функцию в массив зависимостей useEffect
     useEffect(() => {
         if (repoId) {
             fetchRepositoryTree();
         }
-    }, [repoId]);
+    }, [repoId, fetchRepositoryTree]); // <-- Тепер
 
     const handleUploadPipeline = async (files: FileList | null) => {
         if (!files || files.length === 0 || !repoId) return;

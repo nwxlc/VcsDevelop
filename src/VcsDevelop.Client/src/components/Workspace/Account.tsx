@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, {useState, useEffect, useCallback} from 'react';
 
 interface AccountData {
     id: string;
@@ -22,7 +22,7 @@ const Account: React.FC = () => {
     // Для демонстрации берем сохраненный userId, либо подставляем дефолтный из доки, если локального нет
     const userId = localStorage.getItem('accountId') || '';
 
-    const fetchAccountData = async () => {
+    const fetchAccountData = useCallback(async () => {
         setIsLoading(true);
         setError(null);
         try {
@@ -46,12 +46,13 @@ const Account: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [userId, token]); // Функция пересоздастся только при изменении userId или token
 
+
+// 2. В useEffect передаем зависимость правильно
     useEffect(() => {
         fetchAccountData();
-    }, [userId]);
-
+    }, [fetchAccountData]);
     // Красивое форматирование даты создания аккаунта
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);

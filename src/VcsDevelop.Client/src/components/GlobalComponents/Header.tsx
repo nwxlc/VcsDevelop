@@ -21,8 +21,7 @@ const Header = () => {
         };
 
         checkToken();
-    }, [location.pathname]); 
-
+    }, [location.pathname, refreshToken]); 
     return (
         <div className="header">
             <div className="header-title">
