@@ -20,6 +20,7 @@ public sealed class CommitRepository : BaseRepository, ICommitRepository
     public async Task<Commit?> FindByIdAsync(string id, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Commits
+            .Include(commit => commit.ParentIds)
             .SingleOrDefaultAsync(commit => commit.Id == id, cancellationToken)
             .ConfigureAwait(false);
     }

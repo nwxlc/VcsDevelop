@@ -221,6 +221,22 @@ public class DocumentController : ControllerBase
         }
     }
 
+    [HttpGet("{id:guid}/log")]
+    public async Task<ActionResult<DocumentLogResponse>> GetLogAsync(
+        Guid id,
+        [FromServices] IGetDocumentLogHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var query = GetDocumentLogQuery.Create(id);
+
+        var response = await handler.HandleAsync(query, cancellationToken)
+            .ConfigureAwait(false);
+
+        return Ok(response);
+    }
+
     private static string? ValidateFileName(string fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))
