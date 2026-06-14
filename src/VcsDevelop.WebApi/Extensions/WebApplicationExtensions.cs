@@ -1,5 +1,4 @@
 using Hellang.Middleware.ProblemDetails;
-using Scalar.AspNetCore;
 using Serilog;
 using VcsDevelop.Core.Logging;
 using VcsDevelop.Infrastructure.Services;
@@ -22,6 +21,10 @@ public static class WebApplicationExtensions
             app.UseHttpsRedirection();
         }
 
+        app.UseRouting();
+
+        app.UseCors("Client");
+
         app.UseAuthentication();
         app.UseAuthorization();
 
@@ -33,8 +36,6 @@ public static class WebApplicationExtensions
 
         app.UseDefaultFiles();
         app.UseStaticFiles();
-
-        app.UseRouting();
 
         app.MapFallbackToFile("index.html");
 

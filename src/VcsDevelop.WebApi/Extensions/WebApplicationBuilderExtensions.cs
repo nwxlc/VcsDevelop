@@ -24,7 +24,19 @@ public static class WebApplicationBuilderExtensions
 
         service.AddOpenApi();
 
+        service.AddCors(options =>
+        {
+            options.AddPolicy("Client", policy =>
+            {
+                policy
+                    .WithOrigins("http://localhost:5173")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
+
         service.AddAuthentication(configuration);
+        service.AddAuthorization();
 
         service.AddMinioServices(configuration);
 

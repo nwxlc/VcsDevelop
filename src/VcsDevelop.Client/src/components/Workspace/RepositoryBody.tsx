@@ -29,13 +29,16 @@ const RepositoryBody: React.FC = () => {
     } = useFileViewer(repoId, token);
 
     const [filesList, setFilesList] = useState<RepoEntry[]>([]);
+    const [currentPath, setCurrentPath] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const host = 'http://localhost:5050';
-    const treeUrl = `${host}/api/repos/${repoId}/tree`;
+    const treeUrl = currentPath
+        ? `${host}/api/repos/${repoId}/tree?path=${encodeURIComponent(currentPath)}`
+        : `${host}/api/repos/${repoId}/tree`;
     const uploadUrl = `${host}/api/repos/${repoId}/upload`;
     const stageUrl = `${host}/api/repos/${repoId}/stage`;
     const commitUrl = `${host}/api/repos/${repoId}/commit`;
@@ -66,15 +69,14 @@ const RepositoryBody: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [repoId, treeUrl, token]); // <-- Указываем внешние переменные, от которых зависит функция
+    }, [repoId, treeUrl, token]);
 
 
-// 3. Передаем саму функцию в массив зависимостей useEffect
     useEffect(() => {
         if (repoId) {
             fetchRepositoryTree();
         }
-    }, [repoId, fetchRepositoryTree]); // <-- Тепер
+    }, [repoId, fetchRepositoryTree]);
 
     const handleUploadPipeline = async (files: FileList | null) => {
         if (!files || files.length === 0 || !repoId) return;
@@ -115,7 +117,7 @@ const RepositoryBody: React.FC = () => {
                     },
                     body: JSON.stringify({
                         uploadId: uploadId,
-                        repositoryPath: file.name
+                        repositoryPath: currentPath
                     })
                 });
 
@@ -148,6 +150,22 @@ const RepositoryBody: React.FC = () => {
         } finally {
             setIsUploading(false);
         }
+    };
+
+    const handleEntryClick = (entry: RepoEntry) => {
+        if (entry.type === 'directory') {
+            setCurrentPath(entry.path);
+            return;
+        }
+
+        openFile(entry.path);
+    };
+
+    const handleGoUp = () => {
+        if (!currentPath) return;
+
+        const parentPath = currentPath.split('/').slice(0, -1).join('/');
+        setCurrentPath(parentPath);
     };
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -189,7 +207,12 @@ const RepositoryBody: React.FC = () => {
 
             {isEmpty ? (
                 <div className="repo-empty-wrapper">
-                    <h3>Репозиторий пуст</h3>
+                    <h3>{currentPath ? 'Папка пуста' : 'Репозиторий пуст'}</h3>
+                    {currentPath && (
+                        <button onClick={handleGoUp} className="primary-btn small">
+                            назад
+                        </button>
+                    )}
 
                     <div
                         onDragOver={handleDragOver}
@@ -209,7 +232,12 @@ const RepositoryBody: React.FC = () => {
             ) : (
                 <div>
                     <div className="repo-header">
-                        <h2>Содержимое репозитория</h2>
+                        <h2>{currentPath ? currentPath : 'Содержимое репозитория'}</h2>
+                        {currentPath && (
+                            <button onClick={handleGoUp} className="primary-btn small">
+                                назад
+                            </button>
+                        )}
                         <button onClick={() => fileInputRef.current?.click()} className="primary-btn small">
                             загрузить файл
                         </button>
@@ -222,11 +250,11 @@ const RepositoryBody: React.FC = () => {
                                 <span>Название</span>
                                 <span className="repo-file-type">Тип</span>
                             </li>
-                            {filesList.map((file, index) => (
+                            {filesList.map((file) => (
                                 <li
-                                    key={file.blobId || index}
+                                    key={file.path}
                                     className="repo-list-item clickable"
-                                    onClick={() => openFile(file.path)} // Вызов функции открытия при клике
+                                    onClick={() => handleEntryClick(file)}
                                 >
                                     <span>{file.name}</span>
                                     <span className="repo-file-type">{file.type}</span>
