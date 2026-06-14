@@ -237,6 +237,23 @@ public class DocumentController : ControllerBase
         return Ok(response);
     }
 
+    [HttpPost("{id:guid}/revert")]
+    public async Task<ActionResult<RevertDocumentResponse>> RevertAsync(
+        Guid id,
+        [FromBody] RevertDocumentRequest request,
+        [FromServices] IRevertDocumentHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(request);
+
+        var command = RevertDocumentCommand.Create(id, request.CommitId, request.BranchName);
+        var response = await handler.HandleAsync(command, cancellationToken)
+            .ConfigureAwait(false);
+
+        return Ok(response);
+    }
+
     private static string? ValidateFileName(string fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))
