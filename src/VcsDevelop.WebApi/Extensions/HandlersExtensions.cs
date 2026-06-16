@@ -32,6 +32,7 @@ public static class HandlersExtensions
         services.AddScoped<IStageDocumentFileHandler, StageDocumentFileHandler>();
         services.AddScoped<ICommitDocumentHandler, CommitDocumentHandler>();
         services.AddScoped<IGetDocumentLogHandler, GetDocumentLogHandler>();
+        services.AddScoped<IRevertDocumentHandler, RevertDocumentHandler>();
 
         return services;
     }
