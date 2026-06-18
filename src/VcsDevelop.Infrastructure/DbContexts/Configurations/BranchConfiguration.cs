@@ -36,7 +36,7 @@ public sealed class BranchConfiguration : IEntityTypeConfiguration<Branch>
         builder
             .Property(branch => branch.HeadCommitId)
             .HasColumnName("head_commit_id")
-            .HasColumnType("char(40)")
+            .HasColumnType("char(64)")
             .IsRequired();
 
         builder

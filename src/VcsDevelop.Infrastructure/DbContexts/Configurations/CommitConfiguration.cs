@@ -22,7 +22,7 @@ public sealed class CommitConfiguration : IEntityTypeConfiguration<Commit>
         builder
             .Property(commit => commit.Id)
             .HasColumnName("id")
-            .HasColumnType("char(40)");
+            .HasColumnType("char(64)");
 
         builder
             .Property(commit => commit.DocumentId)
@@ -32,7 +32,7 @@ public sealed class CommitConfiguration : IEntityTypeConfiguration<Commit>
         builder
             .Property(commit => commit.RootTreeId)
             .HasColumnName("root_tree_id")
-            .HasColumnType("char(40)")
+            .HasColumnType("char(64)")
             .IsRequired();
 
         builder

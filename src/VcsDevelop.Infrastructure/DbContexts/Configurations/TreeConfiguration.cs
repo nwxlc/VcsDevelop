@@ -21,7 +21,7 @@ public class TreeConfiguration : IEntityTypeConfiguration<Tree>
         builder
             .Property(tree => tree.Id)
             .HasColumnName("tree_id")
-            .HasColumnType("char(40)")
+            .HasColumnType("char(64)")
             .IsRequired();
 
         builder

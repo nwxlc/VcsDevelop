@@ -21,7 +21,7 @@ public sealed class BlobConfiguration : IEntityTypeConfiguration<Blob>
         builder
             .Property(blob => blob.Id)
             .HasColumnName("id")
-            .HasColumnType("char(40)");
+            .HasColumnType("char(64)");
 
         builder
             .Property(blob => blob.Size)

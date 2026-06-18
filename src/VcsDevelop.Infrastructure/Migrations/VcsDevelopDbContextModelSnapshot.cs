@@ -88,7 +88,7 @@ namespace VcsDevelop.Infrastructure.Migrations
             modelBuilder.Entity("VcsDevelop.Domain.VcsObjects.Blob", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("char(40)")
+                        .HasColumnType("char(64)")
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
@@ -122,7 +122,7 @@ namespace VcsDevelop.Infrastructure.Migrations
 
                     b.Property<string>("HeadCommitId")
                         .IsRequired()
-                        .HasColumnType("char(40)")
+                        .HasColumnType("char(64)")
                         .HasColumnName("head_commit_id");
 
                     b.Property<string>("Name")
@@ -146,7 +146,7 @@ namespace VcsDevelop.Infrastructure.Migrations
             modelBuilder.Entity("VcsDevelop.Domain.VcsObjects.Commit", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("char(40)")
+                        .HasColumnType("char(64)")
                         .HasColumnName("id");
 
                     b.Property<Guid>("AccountId")
@@ -163,7 +163,7 @@ namespace VcsDevelop.Infrastructure.Migrations
 
                     b.Property<string>("RootTreeId")
                         .IsRequired()
-                        .HasColumnType("char(40)")
+                        .HasColumnType("char(64)")
                         .HasColumnName("root_tree_id");
 
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Message", "VcsDevelop.Domain.VcsObjects.Commit.Message#CommitMessage", b1 =>
@@ -233,7 +233,7 @@ namespace VcsDevelop.Infrastructure.Migrations
             modelBuilder.Entity("VcsDevelop.Domain.VcsObjects.Tree", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("char(40)")
+                        .HasColumnType("char(64)")
                         .HasColumnName("tree_id");
 
                     b.HasKey("Id")
@@ -285,7 +285,7 @@ namespace VcsDevelop.Infrastructure.Migrations
                     b.OwnsMany("VcsDevelop.Domain.VcsObjects.CommitParent", "ParentIds", b1 =>
                         {
                             b1.Property<string>("commit_id")
-                                .HasColumnType("char(40)");
+                                .HasColumnType("char(64)");
 
                             b1.Property<string>("ParentId")
                                 .HasColumnType("text")
@@ -367,7 +367,7 @@ namespace VcsDevelop.Infrastructure.Migrations
                     b.OwnsMany("VcsDevelop.Domain.VcsObjects.TreeEntry", "Entries", b1 =>
                         {
                             b1.Property<string>("tree_id")
-                                .HasColumnType("char(40)");
+                                .HasColumnType("char(64)");
 
                             b1.Property<int>("id")
                                 .ValueGeneratedOnAdd()
