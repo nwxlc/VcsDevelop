@@ -6,4 +6,5 @@ public sealed class RepositoryTreeEntryResponse
     public required string Path { get; init; }
     public required string Type { get; init; }
     public string? BlobId { get; init; }
+    public string? LastCommitMessage { get; set; }
 }

@@ -254,6 +254,35 @@ public class DocumentController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("{id:guid}/diff")]
+    public async Task<ActionResult<RepositoryDiffResponse>> GetDiffAsync(
+        Guid id,
+        [FromQuery] string fromCommitId,
+        [FromQuery] string toCommitId,
+        [FromQuery] string? path,
+        [FromServices] IGetRepositoryDiffHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+
+        try
+        {
+            var query = GetRepositoryDiffQuery.Create(id, fromCommitId, toCommitId, path);
+            var response = await handler.HandleAsync(query, cancellationToken)
+                .ConfigureAwait(false);
+
+            return Ok(response);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+    }
+
     private static string? ValidateFileName(string fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))

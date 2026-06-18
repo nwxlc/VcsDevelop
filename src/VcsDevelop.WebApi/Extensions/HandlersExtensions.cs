@@ -28,6 +28,7 @@ public static class HandlersExtensions
         services.AddScoped<IGetDocumentsHandler, GetDocumentsHandler>();
         services.AddScoped<IGetRepositoryTreeHandler, GetRepositoryTreeHandler>();
         services.AddScoped<IGetRepositoryBlobHandler, GetRepositoryBlobHandler>();
+        services.AddScoped<IGetRepositoryDiffHandler, GetRepositoryDiffHandler>();
         services.AddScoped<IUploadFileHandler, UploadFileHandler>();
         services.AddScoped<IStageDocumentFileHandler, StageDocumentFileHandler>();
         services.AddScoped<ICommitDocumentHandler, CommitDocumentHandler>();
