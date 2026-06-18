@@ -52,7 +52,7 @@ public sealed class Commit
         var commitIdBytes = Encoding.UTF8.GetBytes(
             $"{documentId:N}:{rootTreeId}:{accountId:N}:{message}:{createdAt.Ticks}");
 
-        var commitId = Convert.ToHexStringLower(SHA1.HashData(commitIdBytes));
+        var commitId = Convert.ToHexStringLower(SHA256.HashData(commitIdBytes));
 
         return new Commit(
             commitId,

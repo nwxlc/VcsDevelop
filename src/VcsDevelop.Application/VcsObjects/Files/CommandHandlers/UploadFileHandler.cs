@@ -119,7 +119,7 @@ public sealed class UploadFileHandler : IUploadFileHandler
 
             await using var readStream = File.OpenRead(tempFilePath);
             var blobId = await _hashService
-                .ComputeSha1Async(readStream, cancellationToken)
+                .ComputeSha256Async(readStream, cancellationToken)
                 .ConfigureAwait(false);
 
             return PreparedUploadFile.Create(

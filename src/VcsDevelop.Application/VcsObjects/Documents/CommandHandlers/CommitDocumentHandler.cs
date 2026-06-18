@@ -236,11 +236,11 @@ public sealed class CommitDocumentHandler : ICommitDocumentHandler
     private static string ComputeTreeId(IReadOnlyCollection<TreeEntry> entries)
     {
         var payload = string.Join('\n', entries.Select(entry => $"{entry.Name}:{entry.ObjectId}"));
-        return ComputeSha1(Encoding.UTF8.GetBytes(payload));
+        return ComputeSha256(Encoding.UTF8.GetBytes(payload));
     }
 
-    private static string ComputeSha1(byte[] data)
+    private static string ComputeSha256(byte[] data)
     {
-        return Convert.ToHexStringLower(SHA1.HashData(data));
+        return Convert.ToHexStringLower(SHA256.HashData(data));
     }
 }

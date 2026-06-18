@@ -2,7 +2,7 @@ namespace VcsDevelop.Application.VcsObjects.Services;
 
 public interface IHashService
 {
-    Task<string> ComputeSha1Async(
+    Task<string> ComputeSha256Async(
         Stream stream,
         CancellationToken cancellationToken);
 }
