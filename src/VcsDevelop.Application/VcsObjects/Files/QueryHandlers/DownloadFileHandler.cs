@@ -50,7 +50,7 @@ public sealed class DownloadFileHandler : IDownloadFileHandler
     public async Task<DownloadFileResponse> HandleAsync(DownloadFileQuery request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        ArgumentException.ThrowIfNullOrEmpty(request.Path);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.Path);
 
         var accountId = _requestContext.GetRequiredAccountId();
 
@@ -127,7 +127,7 @@ public sealed class DownloadFileHandler : IDownloadFileHandler
 
             return DownloadFileResponse.Create(
                 decompressedStream,
-                request.Path ?? Path.GetFileName(downloadFile.FileName),
+                request.Path ?? Path.GetFileName(normalizedPath),
                 downloadFile.ContentType);
         
     }

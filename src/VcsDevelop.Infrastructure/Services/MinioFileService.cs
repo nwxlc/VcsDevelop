@@ -97,7 +97,6 @@ public sealed class MinioFileService : IFileService
             string.IsNullOrWhiteSpace(stat.ContentType)
                 ? "application/octet-stream"
                 : stat.ContentType,
-            stat.ObjectName,
             stat.Size
         );
     }
