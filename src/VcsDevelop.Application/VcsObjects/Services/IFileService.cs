@@ -1,3 +1,5 @@
+using VcsDevelop.Application.VcsObjects.Files.Models;
+
 namespace VcsDevelop.Application.VcsObjects.Services;
 
 public interface IFileService
@@ -6,9 +8,10 @@ public interface IFileService
         Stream stream,
         string key,
         long length,
+        string? contentType,
         CancellationToken cancellationToken);
 
-    Task<Stream> DownloadFileAsync(
+    Task<DownloadFileResult> DownloadFileAsync(
         string key,
         CancellationToken cancellationToken);
 

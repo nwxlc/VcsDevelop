@@ -67,6 +67,7 @@ public sealed class UploadFileHandler : IUploadFileHandler
         await using var preparedUploadFile = await PrepareAsync(
                 request.Stream,
                 request.FileName,
+                request.ContentType,
                 cancellationToken)
             .ConfigureAwait(false);
 
@@ -103,10 +104,12 @@ public sealed class UploadFileHandler : IUploadFileHandler
     private async Task<PreparedUploadFile> PrepareAsync(
         Stream stream,
         string fileName,
+        string contentType,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+        ArgumentNullException.ThrowIfNull(contentType);
 
         var tempFilePath = Path.GetTempFileName();
 
@@ -126,6 +129,7 @@ public sealed class UploadFileHandler : IUploadFileHandler
                 blobId,
                 Path.GetFileName(fileName),
                 tempFilePath,
+                contentType,
                 readStream.Length);
         }
         catch
@@ -167,7 +171,12 @@ public sealed class UploadFileHandler : IUploadFileHandler
             .ConfigureAwait(false);
 
         await _fileService
-            .UploadFileAsync(compressedStream.Stream, objectKey, compressedStream.Length, cancellationToken)
+            .UploadFileAsync(
+                compressedStream.Stream,
+                objectKey,
+                compressedStream.Length,
+                file.ContentType,
+                cancellationToken)
             .ConfigureAwait(false);
 
         try
