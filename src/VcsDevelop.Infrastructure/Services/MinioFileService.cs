@@ -1,5 +1,6 @@
 using Minio;
 using Minio.DataModel.Args;
+using VcsDevelop.Application.VcsObjects.Files.Models;
 using VcsDevelop.Application.VcsObjects.Services;
 using VcsDevelop.Infrastructure.Options.Minio;
 
@@ -25,6 +26,7 @@ public sealed class MinioFileService : IFileService
         Stream stream,
         string key,
         long length,
+        string? contentType,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(stream);
@@ -43,16 +45,23 @@ public sealed class MinioFileService : IFileService
             stream.Position = 0;
         }
 
+        var args = new PutObjectArgs()
+            .WithBucket(targetBucketName)
+            .WithObject(key)
+            .WithStreamData(stream)
+            .WithObjectSize(length);
+
+        if (!string.IsNullOrWhiteSpace(contentType))
+        {
+            args.WithContentType(contentType);
+        }
+
         await _minioClient
-            .PutObjectAsync(new PutObjectArgs()
-                .WithBucket(targetBucketName)
-                .WithObject(key)
-                .WithStreamData(stream)
-                .WithObjectSize(length), cancellationToken)
+            .PutObjectAsync(args, cancellationToken)
             .ConfigureAwait(false);
     }
 
-    public async Task<Stream> DownloadFileAsync(
+    public async Task<DownloadFileResult> DownloadFileAsync(
         string key,
         CancellationToken cancellationToken)
     {
@@ -64,6 +73,13 @@ public sealed class MinioFileService : IFileService
             throw new InvalidOperationException("MinIO bucket name is not configured.");
         }
 
+        var stat = await _minioClient.StatObjectAsync(
+                new StatObjectArgs()
+                    .WithBucket(targetBucketName)
+                    .WithObject(key),
+                cancellationToken)
+            .ConfigureAwait(false);
+
         var output = new MemoryStream();
 
         await _minioClient
@@ -74,7 +90,16 @@ public sealed class MinioFileService : IFileService
             .ConfigureAwait(false);
 
         output.Position = 0;
-        return output;
+
+        return new DownloadFileResult
+        (
+            output,
+            string.IsNullOrWhiteSpace(stat.ContentType)
+                ? "application/octet-stream"
+                : stat.ContentType,
+            stat.ObjectName,
+            stat.Size
+        );
     }
 
     public async Task DeleteFileAsync(

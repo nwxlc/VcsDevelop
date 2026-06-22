@@ -6,6 +6,7 @@ using VcsDevelop.Application.VcsObjects.Documents.CommandHandlers;
 using VcsDevelop.Application.VcsObjects.Documents.QueryHandlers;
 using VcsDevelop.Application.VcsObjects.Files.Abstractions;
 using VcsDevelop.Application.VcsObjects.Files.CommandHandlers;
+using VcsDevelop.Application.VcsObjects.Files.QueryHandlers;
 
 namespace VcsDevelop.WebApi.Extensions;
 
@@ -30,6 +31,7 @@ public static class HandlersExtensions
         services.AddScoped<IGetRepositoryBlobHandler, GetRepositoryBlobHandler>();
         services.AddScoped<IGetRepositoryDiffHandler, GetRepositoryDiffHandler>();
         services.AddScoped<IUploadFileHandler, UploadFileHandler>();
+        services.AddScoped<IDownloadFileHandler, DownloadFileHandler>();
         services.AddScoped<IStageDocumentFileHandler, StageDocumentFileHandler>();
         services.AddScoped<ICommitDocumentHandler, CommitDocumentHandler>();
         services.AddScoped<IGetDocumentLogHandler, GetDocumentLogHandler>();

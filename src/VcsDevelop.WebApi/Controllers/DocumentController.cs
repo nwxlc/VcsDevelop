@@ -6,6 +6,7 @@ using VcsDevelop.Application.VcsObjects.Documents.Entities.Queries;
 using VcsDevelop.Application.VcsObjects.Files.Abstractions;
 using VcsDevelop.Application.VcsObjects.Files.Commands;
 using VcsDevelop.Application.VcsObjects.Files.Models;
+using VcsDevelop.Application.VcsObjects.Files.Queries;
 using VcsDevelop.Domain.VcsObjects.Commands;
 using VcsDevelop.WebApi.Contracts.VcsObjects;
 
@@ -18,6 +19,7 @@ public class DocumentController : ControllerBase
 {
     private const int MaxFileNameLength = 255;
     private const int MaxPageSize = 100;
+    private const string DefaultContentType = "application/octet-stream";
 
     [HttpPost("create")]
     public async Task<IActionResult> CreateDocumentAsync(
@@ -118,12 +120,44 @@ public class DocumentController : ControllerBase
             return BadRequest("File name is invalid.");
         }
 
+        var contentType = string.IsNullOrWhiteSpace(request.File.ContentType)
+            ? DefaultContentType
+            : request.File.ContentType;
+
         await using var stream = request.File.OpenReadStream();
 
-        var command = UploadFileCommand.Create(id, stream, normalizedFileName);
+        var command = UploadFileCommand.Create(id, stream, normalizedFileName, contentType);
         var response = await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
 
         return Ok(response);
+    }
+
+    [HttpGet("{id:guid}/download")]
+    public async Task<IActionResult> DownloadFileAsync(
+        Guid id,
+        [FromQuery] string path,
+        [FromServices] IDownloadFileHandler handler,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+
+        try
+        {
+            var query = DownloadFileQuery.Create(id, path);
+            var response = await handler
+                .HandleAsync(query, cancellationToken)
+                .ConfigureAwait(false);
+
+            return File(response.Stream, response.ContentType, response.FileName);
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpPost("{id:guid}/stage")]
