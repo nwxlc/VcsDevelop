@@ -1,6 +1,6 @@
 # VcsDevelop
 
-VcsDevelop - веб-приложение для управления аккаунтами и репозиториями/документами в стиле VCS. Проект состоит из ASP.NET Core Web API, React + TypeScript клиентской части и набора инфраструктурных сервисов для PostgreSQL, Redis и MinIO.
+VcsDevelop - веб-приложение для управления репозиториями/документами в стиле VCS. Проект состоит из ASP.NET Core Web API, React + TypeScript клиентской части и набора инфраструктурных сервисов для PostgreSQL, Redis и MinIO.
 
 ## Состав
 
