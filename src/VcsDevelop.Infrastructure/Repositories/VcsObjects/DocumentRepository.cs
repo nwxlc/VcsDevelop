@@ -52,6 +52,7 @@ public class DocumentRepository : BaseRepository, IDocumentRepository
 
         return await queryable
             .Where(document => document.OwnerId == ownerId)
+            .OrderByDescending(document => document.CreatedAt)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken)
