@@ -10,16 +10,20 @@ public sealed class CreateDocumentHandler : ICreateDocumentHandler
 {
     private readonly IDocumentRepository _documentRepository;
     private readonly IRequestContext _requestContext;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CreateDocumentHandler(
         IDocumentRepository documentRepository,
-        IRequestContext requestContext)
+        IRequestContext requestContext,
+        IUnitOfWork unitOfWork)
     {
         ArgumentNullException.ThrowIfNull(documentRepository);
         ArgumentNullException.ThrowIfNull(requestContext);
+        ArgumentNullException.ThrowIfNull(unitOfWork);
 
         _documentRepository = documentRepository;
         _requestContext = requestContext;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Guid> HandleAsync(
@@ -27,7 +31,7 @@ public sealed class CreateDocumentHandler : ICreateDocumentHandler
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        
+
         var existingDocument = await _documentRepository
             .FindByNameAndOwnerAsync(
                 request.Name,
@@ -42,7 +46,7 @@ public sealed class CreateDocumentHandler : ICreateDocumentHandler
         }
 
         var documentMetadata = DocumentMetadata.Create(
-            request.Name, 
+            request.Name,
             request.Description ?? string.Empty,
             request.Tags);
 
@@ -52,7 +56,9 @@ public sealed class CreateDocumentHandler : ICreateDocumentHandler
             request.DefaultBranchName,
             documentMetadata);
 
-        await _documentRepository.SetAsync(document, cancellationToken).ConfigureAwait(false);
+        _documentRepository.Add(document);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return document.Id;
     }

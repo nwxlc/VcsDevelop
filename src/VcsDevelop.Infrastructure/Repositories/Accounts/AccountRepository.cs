@@ -6,12 +6,11 @@ using VcsDevelop.Infrastructure.DbContexts;
 
 namespace VcsDevelop.Infrastructure.Repositories.Accounts;
 
-public sealed class AccountRepository : BaseRepository, IAccountRepository
+public sealed class AccountRepository : IAccountRepository
 {
     private readonly VcsDevelopDbContext _dbContext;
 
     public AccountRepository(VcsDevelopDbContext dbContext)
-        : base(dbContext)
     {
         ArgumentNullException.ThrowIfNull(dbContext);
 
@@ -62,13 +61,16 @@ public sealed class AccountRepository : BaseRepository, IAccountRepository
         return account;
     }
 
-    public async Task SetAsync(Account account, CancellationToken cancellationToken = default)
+    public void Add(Account account)
     {
         if (_dbContext.ChangeTracker.Entries<Account>().All(a => a.Entity.Id != account.Id))
         {
             _dbContext.Accounts.Add(account);
         }
+    }
 
-        await CommitAsync(cancellationToken).ConfigureAwait(false);
+    public void Update(Account account)
+    {
+        _dbContext.Accounts.Update(account);
     }
 }

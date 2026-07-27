@@ -9,5 +9,5 @@ public interface IBranchRepository
         string branchName,
         CancellationToken cancellationToken = default);
 
-    Task SetAsync(Branch branch, CancellationToken cancellationToken = default);
+    void Add(Branch branch);
 }

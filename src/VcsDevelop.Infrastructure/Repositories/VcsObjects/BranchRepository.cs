@@ -5,12 +5,11 @@ using Branch = VcsDevelop.Domain.VcsObjects.Branch;
 
 namespace VcsDevelop.Infrastructure.Repositories.VcsObjects;
 
-public sealed class BranchRepository : BaseRepository, IBranchRepository
+public sealed class BranchRepository : IBranchRepository
 {
     private readonly VcsDevelopDbContext _dbContext;
 
     public BranchRepository(VcsDevelopDbContext dbContext)
-        : base(dbContext)
     {
         ArgumentNullException.ThrowIfNull(dbContext);
 
@@ -29,20 +28,11 @@ public sealed class BranchRepository : BaseRepository, IBranchRepository
             .ConfigureAwait(false);
     }
 
-    public async Task SetAsync(Branch branch, CancellationToken cancellationToken = default)
+    public void Add(Branch branch)
     {
         if (_dbContext.ChangeTracker.Entries<Branch>().All(entry => entry.Entity.Id != branch.Id))
         {
-            var existingBranch = await _dbContext.Branches
-                .SingleOrDefaultAsync(item => item.Id == branch.Id, cancellationToken)
-                .ConfigureAwait(false);
-
-            if (existingBranch is null)
-            {
-                _dbContext.Branches.Add(branch);
-            }
+            _dbContext.Branches.Add(branch);
         }
-
-        await CommitAsync(cancellationToken).ConfigureAwait(false);
     }
 }

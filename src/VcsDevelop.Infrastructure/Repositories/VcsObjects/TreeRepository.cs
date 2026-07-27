@@ -5,12 +5,11 @@ using Tree = VcsDevelop.Domain.VcsObjects.Tree;
 
 namespace VcsDevelop.Infrastructure.Repositories.VcsObjects;
 
-public sealed class TreeRepository : BaseRepository, ITreeRepository
+public sealed class TreeRepository : ITreeRepository
 {
     private readonly VcsDevelopDbContext _dbContext;
 
     public TreeRepository(VcsDevelopDbContext dbContext)
-        : base(dbContext)
     {
         ArgumentNullException.ThrowIfNull(dbContext);
 
@@ -24,13 +23,21 @@ public sealed class TreeRepository : BaseRepository, ITreeRepository
             .ConfigureAwait(false);
     }
 
-    public async Task SetAsync(Tree tree, CancellationToken cancellationToken = default)
+    public void Add(Tree tree)
     {
         if (_dbContext.ChangeTracker.Entries<Tree>().All(entry => entry.Entity.Id != tree.Id))
         {
             _dbContext.Trees.Add(tree);
         }
-
-        await CommitAsync(cancellationToken).ConfigureAwait(false);
+    }
+    
+    public async Task<bool> ExistsAsync(string treeId, CancellationToken cancellationToken = default)
+    {
+        var existingBranch = await _dbContext.Trees
+            .AsNoTracking()
+            .AnyAsync(item => item.Id == treeId, cancellationToken)
+            .ConfigureAwait(false);
+        
+        return existingBranch;
     }
 }

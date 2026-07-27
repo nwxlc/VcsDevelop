@@ -119,17 +119,16 @@ public sealed class DownloadFileHandler : IDownloadFileHandler
             .DownloadFileAsync(objectKey, cancellationToken)
             .ConfigureAwait(false);
 
-            var decompressedStream = new MemoryStream();
-            await _compressionService
-                .DecompressAsync(downloadFile.Stream, decompressedStream, cancellationToken)
-                .ConfigureAwait(false);
-            decompressedStream.Position = 0;
+        var decompressedStream = new MemoryStream();
+        await _compressionService
+            .DecompressAsync(downloadFile.Stream, decompressedStream, cancellationToken)
+            .ConfigureAwait(false);
+        decompressedStream.Position = 0;
 
-            return DownloadFileResponse.Create(
-                decompressedStream,
-                request.Path ?? Path.GetFileName(normalizedPath),
-                downloadFile.ContentType);
-        
+        return DownloadFileResponse.Create(
+            decompressedStream,
+            request.Path ?? Path.GetFileName(normalizedPath),
+            downloadFile.ContentType);
     }
 
     private static string BuildObjectKey(string blobId)

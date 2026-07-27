@@ -5,12 +5,11 @@ using Blob = VcsDevelop.Domain.VcsObjects.Blob;
 
 namespace VcsDevelop.Infrastructure.Repositories.VcsObjects;
 
-public sealed class BlobRepository : BaseRepository, IBlobRepository
+public sealed class BlobRepository : IBlobRepository
 {
     private readonly VcsDevelopDbContext _dbContext;
 
     public BlobRepository(VcsDevelopDbContext dbContext)
-        : base(dbContext)
     {
         ArgumentNullException.ThrowIfNull(dbContext);
 
@@ -24,7 +23,7 @@ public sealed class BlobRepository : BaseRepository, IBlobRepository
             .ConfigureAwait(false);
     }
 
-    public async Task<bool> SetAsync(Blob blob, CancellationToken cancellationToken = default)
+    public async Task<bool> TrySetAsync(Blob blob, CancellationToken cancellationToken = default)
     {
         if (_dbContext.ChangeTracker.Entries<Blob>().All(entry => entry.Entity.Id != blob.Id))
         {
@@ -33,7 +32,7 @@ public sealed class BlobRepository : BaseRepository, IBlobRepository
 
         try
         {
-            await CommitAsync(cancellationToken).ConfigureAwait(false);
+            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return true;
         }
         catch (DbUpdateException)
@@ -65,6 +64,6 @@ public sealed class BlobRepository : BaseRepository, IBlobRepository
         }
 
         _dbContext.Blobs.Remove(blob);
-        await CommitAsync(cancellationToken).ConfigureAwait(false);
+        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

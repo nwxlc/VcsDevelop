@@ -6,5 +6,5 @@ public interface ICommitRepository
 {
     Task<Commit?> FindByIdAsync(string id, CancellationToken cancellationToken = default);
 
-    Task SetAsync(Commit commit, CancellationToken cancellationToken = default);
+    void Add(Commit commit);
 }

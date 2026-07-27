@@ -6,5 +6,6 @@ public interface ITreeRepository
 {
     Task<Tree?> FindByIdAsync(string id, CancellationToken cancellationToken = default);
 
-    Task SetAsync(Tree tree, CancellationToken cancellationToken = default);
+    void Add(Tree tree);
+    Task<bool> ExistsAsync(string id, CancellationToken cancellationToken = default);
 }

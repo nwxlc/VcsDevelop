@@ -14,22 +14,26 @@ public sealed class RevertDocumentHandler : IRevertDocumentHandler
     private readonly IDocumentRepository _documentRepository;
     private readonly IBranchRepository _branchRepository;
     private readonly ICommitRepository _commitRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public RevertDocumentHandler(
         IRequestContext requestContext,
         IDocumentRepository documentRepository,
         IBranchRepository branchRepository,
-        ICommitRepository commitRepository)
+        ICommitRepository commitRepository,
+        IUnitOfWork unitOfWork)
     {
         ArgumentNullException.ThrowIfNull(requestContext);
         ArgumentNullException.ThrowIfNull(documentRepository);
         ArgumentNullException.ThrowIfNull(branchRepository);
         ArgumentNullException.ThrowIfNull(commitRepository);
+        ArgumentNullException.ThrowIfNull(unitOfWork);
 
         _requestContext = requestContext;
         _documentRepository = documentRepository;
         _branchRepository = branchRepository;
         _commitRepository = commitRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<RevertDocumentResponse> HandleAsync(RevertDocumentCommand request,
@@ -84,14 +88,14 @@ public sealed class RevertDocumentHandler : IRevertDocumentHandler
             accountId,
             CommitMessage.Create($"Revert to {targetCommit.Id}"));
 
-        await _commitRepository
-            .SetAsync(revertCommit, cancellationToken)
-            .ConfigureAwait(false);
+        _commitRepository.Add(revertCommit);
 
         branch.UpdateHeadCommit(revertCommit.Id);
 
-        await _branchRepository
-            .SetAsync(branch, cancellationToken)
+        _branchRepository.Add(branch);
+
+        await _unitOfWork
+            .SaveChangesAsync(cancellationToken)
             .ConfigureAwait(false);
 
         return new RevertDocumentResponse
