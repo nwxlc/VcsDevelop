@@ -9,16 +9,20 @@ public sealed class UpdateAccountHandler : IUpdateAccountHandler
 {
     private readonly IAccountRepository _accountRepository;
     private readonly IRequestContext _requestContext;
+    private readonly IUnitOfWork _unitOfWork;
 
     public UpdateAccountHandler(
         IAccountRepository accountRepository,
-        IRequestContext requestContext)
+        IRequestContext requestContext,
+        IUnitOfWork unitOfWork)
     {
         ArgumentNullException.ThrowIfNull(accountRepository);
         ArgumentNullException.ThrowIfNull(requestContext);
+        ArgumentNullException.ThrowIfNull(unitOfWork);
 
         _accountRepository = accountRepository;
         _requestContext = requestContext;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task HandleAsync(UpdateAccountCommand command, CancellationToken cancellationToken)
@@ -37,7 +41,7 @@ public sealed class UpdateAccountHandler : IUpdateAccountHandler
         }
 
         account.Update(command.Name, command.Bio, command.AvatarUrl);
-
-        await _accountRepository.SetAsync(account, cancellationToken).ConfigureAwait(false);
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

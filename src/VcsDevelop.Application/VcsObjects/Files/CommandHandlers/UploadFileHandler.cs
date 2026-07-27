@@ -182,7 +182,7 @@ public sealed class UploadFileHandler : IUploadFileHandler
         try
         {
             var blobCreated = await _blobRepository
-                .SetAsync(Blob.Create(file.BlobId, file.Size), cancellationToken)
+                .TrySetAsync(Blob.Create(file.BlobId, file.Size), cancellationToken)
                 .ConfigureAwait(false);
 
             return new StoredFileResult

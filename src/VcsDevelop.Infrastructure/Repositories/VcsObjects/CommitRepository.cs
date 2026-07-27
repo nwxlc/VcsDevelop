@@ -5,12 +5,11 @@ using Commit = VcsDevelop.Domain.VcsObjects.Commit;
 
 namespace VcsDevelop.Infrastructure.Repositories.VcsObjects;
 
-public sealed class CommitRepository : BaseRepository, ICommitRepository
+public sealed class CommitRepository : ICommitRepository
 {
     private readonly VcsDevelopDbContext _dbContext;
 
     public CommitRepository(VcsDevelopDbContext dbContext)
-        : base(dbContext)
     {
         ArgumentNullException.ThrowIfNull(dbContext);
 
@@ -25,13 +24,11 @@ public sealed class CommitRepository : BaseRepository, ICommitRepository
             .ConfigureAwait(false);
     }
 
-    public async Task SetAsync(Commit commit, CancellationToken cancellationToken = default)
+    public void Add(Commit commit)
     {
         if (_dbContext.ChangeTracker.Entries<Commit>().All(entry => entry.Entity.Id != commit.Id))
         {
             _dbContext.Commits.Add(commit);
         }
-
-        await CommitAsync(cancellationToken).ConfigureAwait(false);
     }
 }

@@ -6,12 +6,11 @@ using Document = VcsDevelop.Domain.VcsObjects.Document;
 
 namespace VcsDevelop.Infrastructure.Repositories.VcsObjects;
 
-public class DocumentRepository : BaseRepository, IDocumentRepository
+public class DocumentRepository : IDocumentRepository
 {
     private readonly VcsDevelopDbContext _dbContext;
 
     public DocumentRepository(VcsDevelopDbContext dbContext)
-        : base(dbContext)
     {
         ArgumentNullException.ThrowIfNull(dbContext);
 
@@ -37,7 +36,7 @@ public class DocumentRepository : BaseRepository, IDocumentRepository
 
         if (document is null)
         {
-            throw new DocumentNotFound(document!.Id);
+            throw new DocumentNotFound(id);
         }
 
         return document;
@@ -78,13 +77,11 @@ public class DocumentRepository : BaseRepository, IDocumentRepository
             .ConfigureAwait(false);
     }
 
-    public async Task SetAsync(Document document, CancellationToken cancellationToken = default)
+    public void Add(Document document)
     {
         if (_dbContext.ChangeTracker.Entries<Document>().All(doc => doc.Entity.Id != document.Id))
         {
             _dbContext.Documents.Add(document);
         }
-
-        await CommitAsync(cancellationToken).ConfigureAwait(false);
     }
 }

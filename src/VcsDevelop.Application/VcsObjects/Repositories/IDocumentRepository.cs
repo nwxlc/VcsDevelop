@@ -28,5 +28,5 @@ public interface IDocumentRepository
         Guid ownerId,
         CancellationToken cancellationToken = default);
 
-    Task SetAsync(Document document, CancellationToken cancellationToken = default);
+    void Add(Document document);
 }

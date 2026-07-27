@@ -2,6 +2,7 @@ using VcsDevelop.Application.Accounts.Abstractions;
 using VcsDevelop.Application.Accounts.Auth;
 using VcsDevelop.Application.Accounts.Entities.Models;
 using VcsDevelop.Application.Accounts.Repositories;
+using VcsDevelop.Core.Application;
 using VcsDevelop.Domain.Accounts;
 using VcsDevelop.Domain.Accounts.Commands;
 using VcsDevelop.Domain.Accounts.Errors;
@@ -13,19 +14,23 @@ public sealed class RegistrationCommandHandler : IRegistrationCommandHandler
     private readonly IAccountRepository _accountRepository;
     private readonly ITokenProvider _tokenProvider;
     private readonly IRefreshTokenProvider _refreshTokenProvider;
+    private readonly IUnitOfWork _unitOfWork;
 
     public RegistrationCommandHandler(
         IAccountRepository accountRepository,
         ITokenProvider tokenProvider,
-        IRefreshTokenProvider refreshTokenProvider)
+        IRefreshTokenProvider refreshTokenProvider,
+        IUnitOfWork unitOfWork)
     {
         ArgumentNullException.ThrowIfNull(accountRepository);
         ArgumentNullException.ThrowIfNull(tokenProvider);
         ArgumentNullException.ThrowIfNull(refreshTokenProvider);
+        ArgumentNullException.ThrowIfNull(unitOfWork);
 
         _accountRepository = accountRepository;
         _tokenProvider = tokenProvider;
         _refreshTokenProvider = refreshTokenProvider;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<AccountResponse> HandleAsync(RegistrationCommand request, CancellationToken cancellationToken)
@@ -41,8 +46,9 @@ public sealed class RegistrationCommandHandler : IRegistrationCommandHandler
 
         var account = Account.Create(request.Name, request.Email, request.Password);
 
-        await _accountRepository.SetAsync(account, cancellationToken)
-            .ConfigureAwait(false);
+        _accountRepository.Add(account);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         var token = _tokenProvider.CreateToken(account);
 

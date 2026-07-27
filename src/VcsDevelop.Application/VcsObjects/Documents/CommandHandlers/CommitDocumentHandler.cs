@@ -18,6 +18,7 @@ public sealed class CommitDocumentHandler : ICommitDocumentHandler
     private readonly IRequestContext _requestContext;
     private readonly IStagingAreaRepository _stagingAreaRepository;
     private readonly ITreeRepository _treeRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CommitDocumentHandler(
         IDocumentRepository documentRepository,
@@ -25,7 +26,8 @@ public sealed class CommitDocumentHandler : ICommitDocumentHandler
         ICommitRepository commitRepository,
         ITreeRepository treeRepository,
         IStagingAreaRepository stagingAreaRepository,
-        IRequestContext requestContext)
+        IRequestContext requestContext,
+        IUnitOfWork unitOfWork)
     {
         ArgumentNullException.ThrowIfNull(documentRepository);
         ArgumentNullException.ThrowIfNull(branchRepository);
@@ -33,6 +35,7 @@ public sealed class CommitDocumentHandler : ICommitDocumentHandler
         ArgumentNullException.ThrowIfNull(treeRepository);
         ArgumentNullException.ThrowIfNull(stagingAreaRepository);
         ArgumentNullException.ThrowIfNull(requestContext);
+        ArgumentNullException.ThrowIfNull(unitOfWork);
 
         _documentRepository = documentRepository;
         _branchRepository = branchRepository;
@@ -40,6 +43,7 @@ public sealed class CommitDocumentHandler : ICommitDocumentHandler
         _treeRepository = treeRepository;
         _stagingAreaRepository = stagingAreaRepository;
         _requestContext = requestContext;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<CommitDocumentResponse> HandleAsync(
@@ -63,17 +67,18 @@ public sealed class CommitDocumentHandler : ICommitDocumentHandler
 
         var tree = await StoreTreeAsync(branch, stagedEntries, cancellationToken).ConfigureAwait(false);
 
-        var commit = await StoreCommitAsync(
-                document,
-                branch,
-                tree,
-                accountId,
-                request.Message,
-                cancellationToken)
-            .ConfigureAwait(false);
+        var commit = StoreCommit(
+            document,
+            branch,
+            tree,
+            accountId,
+            request.Message);
 
-        branch = await StoreBranchAsync(document, branch, commit.Id, cancellationToken).ConfigureAwait(false);
+        branch = StoreBranch(document, branch, commit.Id);
+
         await _stagingAreaRepository.ClearAsync(document.Id, accountId, cancellationToken).ConfigureAwait(false);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return new CommitDocumentResponse
         {
@@ -126,37 +131,39 @@ public sealed class CommitDocumentHandler : ICommitDocumentHandler
     {
         var treeEntries = await BuildTreeEntriesAsync(branch, stagedEntries, cancellationToken)
             .ConfigureAwait(false);
+
         var tree = Tree.Create(ComputeTreeId(treeEntries), treeEntries);
 
-        await _treeRepository.SetAsync(tree, cancellationToken).ConfigureAwait(false);
+        if (!await _treeRepository.ExistsAsync(tree.Id, cancellationToken).ConfigureAwait(false))
+        {
+            _treeRepository.Add(tree);
+        }
 
         return tree;
     }
 
-    private async Task<Commit> StoreCommitAsync(
+    private Commit StoreCommit(
         Document document,
         Branch? branch,
         Tree tree,
         Guid accountId,
-        string message,
-        CancellationToken cancellationToken)
+        string message)
     {
         var commit = CreateCommit(document, branch, tree.Id, accountId, message);
 
-        await _commitRepository.SetAsync(commit, cancellationToken).ConfigureAwait(false);
+        _commitRepository.Add(commit);
 
         return commit;
     }
 
-    private async Task<Branch> StoreBranchAsync(
+    private Branch StoreBranch(
         Document document,
         Branch? branch,
-        string commitId,
-        CancellationToken cancellationToken)
+        string commitId)
     {
         branch = CreateOrUpdateBranch(document, branch, commitId);
 
-        await _branchRepository.SetAsync(branch, cancellationToken).ConfigureAwait(false);
+        _branchRepository.Add(branch);
 
         return branch;
     }

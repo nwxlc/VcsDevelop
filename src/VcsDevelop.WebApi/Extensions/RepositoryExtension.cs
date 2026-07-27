@@ -1,6 +1,7 @@
 using StackExchange.Redis;
 using VcsDevelop.Application.Accounts.Repositories;
 using VcsDevelop.Application.VcsObjects.Repositories;
+using VcsDevelop.Core.Application;
 using VcsDevelop.Infrastructure.Auth;
 using VcsDevelop.Infrastructure.Repositories.Accounts;
 using VcsDevelop.Infrastructure.Repositories.VcsObjects;
@@ -15,12 +16,12 @@ public static class RepositoryExtension
         ArgumentNullException.ThrowIfNull(services);
 
         services.AddScoped<IAccountRepository, AccountRepository>();
-
         services.AddScoped<IDocumentRepository, DocumentRepository>();
         services.AddScoped<IBlobRepository, BlobRepository>();
         services.AddScoped<ITreeRepository, TreeRepository>();
         services.AddScoped<ICommitRepository, CommitRepository>();
         services.AddScoped<IBranchRepository, BranchRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddSingleton<IConnectionMultiplexer>(serviceProvider =>
         {
